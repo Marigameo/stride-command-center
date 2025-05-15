@@ -167,7 +167,7 @@ const AccountSettings = () => {
   }
 
   const handleReauth = (connectionId: string) => {
-    navigate('/reauth');
+    navigate(`/reauth/${connectionId}`);
   };
 
   const handleRevoke = (connectionId: string) => {
@@ -338,7 +338,7 @@ const AccountSettings = () => {
                       variant="outline"
                       size="sm"
                       className="flex items-center gap-2"
-                      onClick={() => handleReauth(connection.id)}
+                      onClick={() => handleReauth(connection.id)} 
                     >
                       <RefreshCcw className="h-4 w-4" />
                       Reauthorize
