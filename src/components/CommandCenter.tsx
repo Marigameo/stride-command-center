@@ -1,4 +1,3 @@
-
 import {
   Carousel,
   CarouselContent,
@@ -15,53 +14,53 @@ import { attentionItems, performanceMetrics, agentsGlance } from "@/data/mockDat
 const CommandCenter = () => {
   return (
     <div className="space-y-8">
-      <section>
+      <section className="overflow-x-hidden">
         <h2 className="text-xl font-semibold mb-4">Attention Required</h2>
-        <Carousel
-          opts={{
-            align: "start",
-          }}
-          className="w-full"
-        >
-          <CarouselContent>
-            {attentionItems.map((item) => (
-              <CarouselItem key={item.id} className="md:basis-1/2 lg:basis-1/3">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm font-medium text-gray-500">{item.actionType}</div>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        item.impact === "High" ? "bg-orange-100 text-orange-800" : 
-                        item.impact === "Medium" ? "bg-blue-100 text-blue-800" : 
-                        item.impact === "Critical" ? "bg-red-100 text-red-800" : 
-                        "bg-gray-100 text-gray-800"
-                      }`}>
-                        {item.impact}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-medium text-gray-700">
-                        {item.agentLogo}
+        <div className="relative px-4">
+          <Carousel
+            opts={{
+              align: "start",
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {attentionItems.map((item) => (
+                <CarouselItem key={item.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-center">
+                        <div className="text-sm font-medium text-gray-500">{item.actionType}</div>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          item.impact === "High" ? "bg-orange-100 text-orange-800" : 
+                          item.impact === "Medium" ? "bg-blue-100 text-blue-800" : 
+                          item.impact === "Critical" ? "bg-red-100 text-red-800" : 
+                          "bg-gray-100 text-gray-800"
+                        }`}>
+                          {item.impact}
+                        </span>
                       </div>
-                      <div className="font-medium">{item.agentName}</div>
-                    </div>
-                    <p className="text-sm text-gray-600">{item.description}</p>
-                  </CardContent>
-                  <CardFooter className="flex gap-2">
-                    <Button className="flex-1">{item.primaryCta}</Button>
-                    <Button variant="outline" className="flex-1">{item.secondaryCta}</Button>
-                  </CardFooter>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="flex justify-end gap-2 mt-4">
-            <CarouselPrevious />
-            <CarouselNext />
-          </div>
-        </Carousel>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-medium text-gray-700">
+                          {item.agentLogo}
+                        </div>
+                        <div className="font-medium">{item.agentName}</div>
+                      </div>
+                      <p className="text-sm text-gray-600">{item.description}</p>
+                    </CardContent>
+                    <CardFooter className="flex gap-2">
+                      <Button className="flex-1">{item.primaryCta}</Button>
+                      <Button variant="outline" className="flex-1">{item.secondaryCta}</Button>
+                    </CardFooter>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300" />
+            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300" />
+          </Carousel>
+        </div>
       </section>
 
       <section>

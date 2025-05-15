@@ -1,7 +1,7 @@
-
 import Layout from "@/components/Layout";
 import { useAppStore } from "@/store/appStore";
 import CommandCenter from "@/components/CommandCenter";
+import MyWorkforce from "@/components/MyWorkforce";
 import MyTasks from "@/components/MyTasks";
 import Insights from "@/components/Insights";
 import AccountSettings from "@/components/AccountSettings";
@@ -14,6 +14,8 @@ const Index = () => {
     switch (currentPage) {
       case "commandCenter":
         return <CommandCenter />;
+      case "myWorkforce":
+        return <MyWorkforce />;
       case "myTasks":
         return <MyTasks />;
       case "insights":

@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 
-export type Page = 'commandCenter' | 'myTasks' | 'insights' | 'marketplace' | 'accountSettings';
+export type Page = 'commandCenter' | 'myWorkforce' | 'myTasks' | 'insights' | 'marketplace' | 'accountSettings';
 
 interface AppState {
   currentPage: Page;

@@ -1,20 +1,21 @@
-
 import { useAppStore, type Page } from "@/store/appStore";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, CheckSquare, BarChart3, ShoppingBag, Settings, ChevronLeft, ChevronRight } from "lucide-react";
+import { MonitorCog, Lightbulb, Store, UsersRound, Settings, ChevronLeft, ChevronRight, ClipboardList } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+
 
 const Sidebar = () => {
   const { currentPage, setCurrentPage, sidebarCollapsed, toggleSidebar } = useAppStore();
 
   const menuItems: { id: Page; title: string; icon: React.ReactNode; disabled?: boolean; badge?: string }[] = [
-    { id: "commandCenter", title: "Command Centre", icon: <LayoutDashboard size={20} /> },
-    { id: "myTasks", title: "My Tasks", icon: <CheckSquare size={20} /> },
-    { id: "insights", title: "Insights", icon: <BarChart3 size={20} /> },
+    { id: "commandCenter", title: "Command Center", icon: <MonitorCog size={20} /> },
+    { id: "myWorkforce", title: "My Workforce", icon: <UsersRound size={20} /> },
+    { id: "myTasks", title: "My Tasks", icon: <ClipboardList size={20} /> },
+    { id: "insights", title: "Insights", icon: <Lightbulb size={20} /> },
     { 
       id: "marketplace", 
       title: "Marketplace", 
-      icon: <ShoppingBag size={20} />, 
+      icon: <Store size={20} />, 
       disabled: true,
       badge: "Coming Soon"
     },
@@ -30,7 +31,19 @@ const Sidebar = () => {
     >
       <div className="flex flex-col h-full">
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          {!sidebarCollapsed && <h1 className="text-lg font-semibold">StriveLabs</h1>}
+          <div className="flex items-center">
+            {!sidebarCollapsed && (
+              <img 
+                src="/strivelabs-logo.svg" 
+                alt="StriveLabs" 
+                style={{
+                  width: 120,
+                  height: 40,
+                  objectFit: 'contain'
+                }}
+              />
+            )}
+          </div>
           <button 
             onClick={toggleSidebar} 
             className="p-2 hover:bg-gray-100 rounded-md ml-auto"
@@ -50,14 +63,18 @@ const Sidebar = () => {
                   className={cn(
                     "flex items-center w-full px-4 py-2.5 hover:bg-gray-100 hover:text-primary transition-colors",
                     currentPage === item.id ? "text-primary bg-orange-50" : "text-gray-700",
-                    item.disabled && "opacity-60 cursor-not-allowed"
+                    item.disabled && "cursor-not-allowed"
                   )}
                 >
-                  <span className="inline-flex">{item.icon}</span>
+                  <span className={cn(
+                    "inline-flex",
+                    sidebarCollapsed && "w-full justify-center",
+                    item.disabled && "opacity-60"
+                  )}>{item.icon}</span>
                   {!sidebarCollapsed && (
                     <div className="ml-3 flex items-center justify-between w-full">
                       <span className="text-sm font-medium">{item.title}</span>
-                      {item.badge && <Badge variant="outline" className="ml-2 bg-gray-100">{item.badge}</Badge>}
+                      {item.badge && <Badge variant="outlineGreen" className="ml-2 text-[9px]">{item.badge}</Badge>}
                     </div>
                   )}
                 </button>
