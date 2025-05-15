@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "@/components/ui/use-toast";
 
 const profileFormSchema = z.object({
   username: z.string().min(2, {
@@ -37,8 +38,18 @@ const notificationsFormSchema = z.object({
   marketingEmails: z.boolean(),
 });
 
+const securityFormSchema = z.object({
+  currentPassword: z.string().min(1, { message: "Current password is required" }),
+  newPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  confirmNewPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
+}).refine((data) => data.newPassword === data.confirmNewPassword, {
+  message: "Passwords do not match",
+  path: ["confirmNewPassword"],
+});
+
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
+type SecurityFormValues = z.infer<typeof securityFormSchema>;
 
 const AccountSettings = () => {
   const profileForm = useForm<ProfileFormValues>({
@@ -60,12 +71,45 @@ const AccountSettings = () => {
     },
   });
 
+  const securityForm = useForm<SecurityFormValues>({
+    resolver: zodResolver(securityFormSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    },
+  });
+
   function onProfileSubmit(data: ProfileFormValues) {
     console.log("Profile data submitted:", data);
+    toast({
+      title: "Profile updated",
+      description: "Your profile has been updated successfully.",
+    });
   }
 
   function onNotificationsSubmit(data: NotificationsFormValues) {
     console.log("Notification settings submitted:", data);
+    toast({
+      title: "Notification settings updated",
+      description: "Your notification preferences have been saved.",
+    });
+  }
+
+  function onSecuritySubmit(data: SecurityFormValues) {
+    console.log("Security settings submitted:", data);
+    toast({
+      title: "Password updated",
+      description: "Your password has been changed successfully.",
+    });
+  }
+
+  function onDeleteAccount() {
+    toast({
+      title: "Account deletion requested",
+      description: "Your account deletion request has been submitted for processing.",
+      variant: "destructive",
+    });
   }
 
   return (
@@ -253,23 +297,50 @@ const AccountSettings = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-medium">Change Password</h3>
-                  <div className="mt-4 space-y-4">
-                    <div>
-                      <FormLabel>Current Password</FormLabel>
-                      <Input type="password" placeholder="••••••••" />
-                    </div>
-                    <div>
-                      <FormLabel>New Password</FormLabel>
-                      <Input type="password" placeholder="••••••••" />
-                    </div>
-                    <div>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <Input type="password" placeholder="••••••••" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <Button>Update Password</Button>
-                  </div>
+                  <Form {...securityForm}>
+                    <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)} className="mt-4 space-y-4">
+                      <FormField
+                        control={securityForm.control}
+                        name="currentPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Current Password</FormLabel>
+                            <FormControl>
+                              <Input type="password" placeholder="••••••••" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={securityForm.control}
+                        name="newPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>New Password</FormLabel>
+                            <FormControl>
+                              <Input type="password" placeholder="••••••••" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={securityForm.control}
+                        name="confirmNewPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm New Password</FormLabel>
+                            <FormControl>
+                              <Input type="password" placeholder="••••••••" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button type="submit">Update Password</Button>
+                    </form>
+                  </Form>
                 </div>
 
                 <Separator />
@@ -289,7 +360,7 @@ const AccountSettings = () => {
                   <p className="text-sm text-gray-500 mt-1 mb-4">
                     Permanently delete your account and all associated data.
                   </p>
-                  <Button variant="destructive">Delete Account</Button>
+                  <Button variant="destructive" onClick={onDeleteAccount}>Delete Account</Button>
                 </div>
               </div>
             </CardContent>
