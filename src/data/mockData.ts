@@ -1,44 +1,51 @@
-
 export const attentionItems = [
   {
     id: 1,
-    actionType: "Performance Review",
-    agentName: "Sales Agent",
-    agentLogo: "S",
+    actionType: "Approval Required",
+    agentName: "Keyword Optimizer",
+    agentLogo: "K",
+    lucideIcon: "FileSearch2",
     impact: "High",
-    primaryCta: "Review Now",
-    secondaryCta: "Dismiss",
-    description: "Sales agent performance has dropped by 15% this week"
+    primaryCta: "Review",
+    secondaryCta: "Defer",
+    description: "+$524 in savings",
+    actionTypeColor: "text-orange-600",
+    descriptionColor: "text-green-600",
+    primaryCtaAction: "navigateToAgent",
+    secondaryCtaAction: "hideCard",
+    agentPageUrl: "/agents/keyword-optimizer"
   },
   {
     id: 2,
-    actionType: "Task Completion",
-    agentName: "Customer Support",
+    actionType: "Anomaly Detected",
+    agentName: "Conversion Funnel Optimizer",
     agentLogo: "C",
-    impact: "Medium",
-    primaryCta: "Complete Task",
-    secondaryCta: "Reschedule",
-    description: "3 customer support tickets need immediate attention"
+    lucideIcon: "Funnel",
+    impact: "Critical",
+    primaryCta: "View Anomaly",
+    secondaryCta: "Diagnose",
+    description: "-34% Leads WoW",
+    actionTypeColor: "text-red-600",
+    descriptionColor: "text-red-500",
+    primaryCtaAction: "navigateToAgent",
+    secondaryCtaAction: "navigateToAgent",
+    agentPageUrl: "/agents/conversion-funnel-optimizer"
   },
   {
     id: 3,
-    actionType: "System Alert",
-    agentName: "Technical Agent",
-    agentLogo: "T",
+    actionType: "Unblocking Required",
+    agentName: "Books Reconciler",
+    agentLogo: "B",
+    lucideIcon: "BookOpenText",
     impact: "Critical",
-    primaryCta: "Investigate",
-    secondaryCta: "Silence Alert",
-    description: "Technical agent detected unusual system activity"
-  },
-  {
-    id: 4,
-    actionType: "Training Required",
-    agentName: "New Agent",
-    agentLogo: "N",
-    impact: "Low",
-    primaryCta: "Start Training",
-    secondaryCta: "Schedule Later",
-    description: "New agent requires training on updated procedures"
+    primaryCta: "View Error",
+    secondaryCta: "Reauth",
+    description: "27 Expenses Pending",
+    actionTypeColor: "text-red-600",
+    descriptionColor: "text-red-500",
+    primaryCtaAction: "navigateToReauth",
+    secondaryCtaAction: "navigateToReauth",
+    reauthPageUrl: "/reauth/books-reconciler"
   }
 ];
 

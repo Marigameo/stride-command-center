@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -8,59 +9,112 @@ import {
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ArrowDown, ArrowUp, Minus } from "lucide-react";
+import { ArrowDown, ArrowUp, Minus, AlertTriangle, LucideProps, FileSearch2, Filter, BookOpenText } from "lucide-react";
 import { attentionItems, performanceMetrics, agentsGlance } from "@/data/mockData";
+import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
+
+// Define a type for Lucide icon components
+type LucideIconComponent = React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
+
+// Helper to get Lucide icon component by name
+const getLucideIcon = (iconName: string): LucideIconComponent | null => {
+  switch (iconName) {
+    case 'FileSearch2': return FileSearch2;
+    case 'Funnel': return Filter;
+    case 'BookOpenText': return BookOpenText;
+    default: return null;
+  }
+};
 
 const CommandCenter = () => {
+  const [hiddenItems, setHiddenItems] = useState<number[]>([]);
+  const navigate = useNavigate();
+
+  const handleCta = (action: string | undefined, url: string | undefined, itemId: number) => {
+    if (!action) return;
+
+    switch (action) {
+      case 'navigateToAgent':
+        if (url) window.location.href = url;
+        break;
+      case 'hideCard':
+        setHiddenItems(prev => [...prev, itemId]);
+        break;
+      case 'navigateToReauth':
+        if (url) navigate(url);
+        break;
+      default:
+        console.warn('Unknown CTA action:', action);
+    }
+  };
+
+  const visibleAttentionItems = attentionItems.filter(item => !hiddenItems.includes(item.id));
+
   return (
     <div className="space-y-8">
       <section className="overflow-x-hidden">
         <h2 className="text-xl font-semibold mb-4">Attention Required</h2>
-        <div className="relative px-4">
-          <Carousel
-            opts={{
-              align: "start",
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-4">
-              {attentionItems.map((item) => (
-                <CarouselItem key={item.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-center">
-                        <div className="text-sm font-medium text-gray-500">{item.actionType}</div>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          item.impact === "High" ? "bg-orange-100 text-orange-800" : 
-                          item.impact === "Medium" ? "bg-blue-100 text-blue-800" : 
-                          item.impact === "Critical" ? "bg-red-100 text-red-800" : 
-                          "bg-gray-100 text-gray-800"
-                        }`}>
-                          {item.impact}
-                        </span>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-medium text-gray-700">
-                          {item.agentLogo}
-                        </div>
-                        <div className="font-medium">{item.agentName}</div>
-                      </div>
-                      <p className="text-sm text-gray-600">{item.description}</p>
-                    </CardContent>
-                    <CardFooter className="flex gap-2">
-                      <Button className="flex-1">{item.primaryCta}</Button>
-                      <Button variant="outline" className="flex-1">{item.secondaryCta}</Button>
-                    </CardFooter>
-                  </Card>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300" />
-            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300" />
-          </Carousel>
-        </div>
+        {visibleAttentionItems.length > 0 ? (
+          <div className="relative px-4">
+            <Carousel
+              opts={{
+                align: "start",
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {visibleAttentionItems.map((item) => {
+                  const IconComponent = item.lucideIcon ? getLucideIcon(item.lucideIcon) : null;
+                  return (
+                    <CarouselItem 
+                      key={item.id} 
+                      className={cn(
+                        "pl-4 md:basis-1/2 lg:basis-1/3 transition-all duration-300 ease-out",
+                        hiddenItems.includes(item.id) ? 'opacity-0 max-h-0 scale-y-90 !p-0 !m-0 border-none' : 'opacity-100 max-h-[500px] scale-y-100'
+                      )}
+                      style={{ transformOrigin: 'top' }}
+                    >
+                      <Card className={cn("flex flex-col h-[250px]", hiddenItems.includes(item.id) && "invisible")}>
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-start">
+                            <div className={cn("text-sm font-medium", item.actionTypeColor)}>{item.actionType}</div>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.impact === "High" ? "bg-orange-100 text-orange-600" : item.impact === "Medium" ? "bg-blue-100 text-blue-800" : item.impact === "Critical" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}`}>
+                              {item.impact}
+                            </span>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                          <div className="flex items-center gap-3 my-3">
+                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg">
+                              {IconComponent ? <IconComponent size={24} /> : item.agentLogo}
+                            </div>
+                            <div className="font-medium text-base">{item.agentName}</div>
+                          </div>
+                          <p className={cn("mt-6 font-medium text-sm", item.descriptionColor)}>{item.description}</p>
+                        </CardContent>
+                        <CardFooter className="flex gap-2 mt-auto border-t pt-4">
+                          <Button className="flex-1" onClick={() => handleCta(item.primaryCtaAction, item.agentPageUrl || item.reauthPageUrl, item.id)}>{item.primaryCta}</Button>
+                          <Button variant="outline" className="flex-1" onClick={() => handleCta(item.secondaryCtaAction, item.agentPageUrl || item.reauthPageUrl, item.id)}>{item.secondaryCta}</Button>
+                        </CardFooter>
+                      </Card>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+              {visibleAttentionItems.length > 1 && (
+                <>
+                  <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300 z-10" />
+                  <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300 z-10" />
+                </>
+              )}
+            </Carousel>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            No items requiring attention.
+          </div>
+        )}
       </section>
 
       <section>
@@ -83,11 +137,7 @@ const CommandCenter = () => {
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-semibold">{metric.value}</span>
-                  <span className={`text-sm ${
-                    metric.trend === "up" ? "text-green-600" : 
-                    metric.trend === "down" ? "text-red-600" : 
-                    "text-gray-600"
-                  }`}>
+                  <span className={`text-sm ${metric.trend === "up" ? "text-green-600" : metric.trend === "down" ? "text-red-600" : "text-gray-600"}`}>
                     {metric.change}
                   </span>
                 </div>
@@ -106,10 +156,7 @@ const CommandCenter = () => {
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-medium">{agent.name}</h3>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    agent.status === "Active" ? "bg-green-100 text-green-800" : 
-                    "bg-gray-100 text-gray-800"
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${agent.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
                     {agent.status}
                   </span>
                 </div>
