@@ -19,7 +19,7 @@ const queryClient = new QueryClient();
 
 // External agent URLs
 const AGENT_URLS = {
-  keywordOptimizer: "https://preview--keyword-review-pilot.lovable.app/",
+  keywordOptimizer: "https://keyword-optimizer.vercel.app/",
   conversionFunnel: "https://kzmkh0380c33wiacads9.lite.vusercontent.net/"
 };
 
