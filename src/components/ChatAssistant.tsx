@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
@@ -302,13 +301,16 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
         <DrawerHeader className="border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-primary" />
-              <DrawerTitle>Strive Assistant</DrawerTitle>
+              <img
+                src="/strivelabs-logo.svg"
+                alt="StriveLabs"
+                style={{ width: 120, height: 40, objectFit: 'contain' }}
+              />
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1 text-xs text-green-600">
                 <CircleDot className="h-3 w-3" />
-                <span>Active</span>
+                <span>Ready</span>
               </div>
               <DrawerClose onClick={handleClose}>
                 <X className="h-4 w-4" />
@@ -323,7 +325,7 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
                 <MessageCircle className="h-12 w-12 text-primary/20 mb-4" />
                 <h3 className="text-lg font-medium mb-2">Welcome to Strive Assistant</h3>
                 <p className="text-muted-foreground mb-6">
-                  I can help you get insights about your platform performance and tasks.
+                  I can help you get insights about your agents & tasks
                 </p>
               </div>
             ) : (
@@ -365,7 +367,7 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
 
           {messages.length === 0 && (
             <div className="p-4 border-t">
-              <p className="text-sm text-muted-foreground mb-3">Suggested queries:</p>
+              <p className="text-sm text-muted-foreground mb-3">Suggestions:</p>
               <div className="flex flex-wrap gap-2">
                 {suggestions.map((suggestion) => (
                   <Button

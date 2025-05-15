@@ -52,43 +52,19 @@ export const attentionItems = [
 export const performanceMetrics = [
   {
     id: 1,
-    metric: "Conversion Rate",
+    metric: "Total Cost Saved",
     trend: "up",
-    value: "24.8%",
-    change: "+2.4%",
+    value: "$7489",
+    change: "+14%",
     timeline: "This Week"
   },
   {
     id: 2,
-    metric: "Response Time",
-    trend: "down",
-    value: "1.2 min",
-    change: "-0.3 min",
-    timeline: "This Month"
-  },
-  {
-    id: 3,
     metric: "Task Completion",
     trend: "up",
     value: "89%",
     change: "+5%",
     timeline: "This Week"
-  },
-  {
-    id: 4,
-    metric: "Customer Satisfaction",
-    trend: "stable",
-    value: "4.7/5",
-    change: "0%",
-    timeline: "This Month"
-  },
-  {
-    id: 5,
-    metric: "Revenue Generated",
-    trend: "up",
-    value: "$12,450",
-    change: "+8.3%",
-    timeline: "This Quarter"
   },
   {
     id: 6,
@@ -103,30 +79,42 @@ export const performanceMetrics = [
 export const agentsGlance = [
   {
     id: 1,
-    name: "Sales Agent",
-    status: "Active",
-    currentTask: "Qualifying new leads",
+    name: "Keyword Optimizer",
+    agentLogo: "K",
+    lucideIcon: "FileSearch2",
+    status: "Waiting",
+    currentTask: "Optimizing Holiday Campaign",
     progress: 65,
-    metric: "22 Leads Processed",
-    cta: "View Details"
+    metric: "Est. +$780 potential savings",
+    cta: "Review",
+    ctaAction: "navigateToAgent",
+    agentPageUrl: "/agents/keyword-optimizer"
   },
   {
     id: 2,
-    name: "Support Agent",
+    name: "Conversion Funnel Optimizer",
+    agentLogo: "C",
+    lucideIcon: "Funnel",
     status: "Idle",
-    lastCompleted: "Resolved ticket #45892",
+    lastCompleted: "A/B Test Concluded",
     progress: 100,
-    metric: "12 Tickets Closed Today",
-    cta: "Assign Task"
+    metric: "Ready for new task",
+    cta: "Review",
+    ctaAction: "navigateToAgent",
+    agentPageUrl: "/agents/conversion-funnel-optimizer"
   },
   {
     id: 3,
-    name: "Marketing Agent",
+    name: "Books Reconciler",
+    agentLogo: "B",
+    lucideIcon: "BookOpenText",
     status: "Active",
-    currentTask: "Email campaign analysis",
+    currentTask: "Reconciling Q3 Expenses",
     progress: 30,
-    metric: "38% Open Rate",
-    cta: "View Details"
+    metric: "12 Overdue Reconciliations",
+    cta: "Review",
+    ctaAction: "navigateToAgent",
+    agentPageUrl: "/agents/books-reconciler"
   }
 ];
 

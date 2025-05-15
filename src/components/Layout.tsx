@@ -1,16 +1,12 @@
-
 import { ReactNode, useState } from "react";
 import Sidebar from "./Sidebar";
 import { useAppStore } from "@/store/appStore";
 import { Button } from "./ui/button";
 import { MessageCircle } from "lucide-react";
 import ChatAssistant from "./ChatAssistant";
+import { Outlet } from "react-router-dom";
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
+const Layout = () => {
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed);
   const [chatOpen, setChatOpen] = useState(false);
   
@@ -36,7 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
             </Button>
           </div>
           <div className="flex-1">
-            {children}
+            <Outlet />
           </div>
         </div>
       </main>
