@@ -5,7 +5,6 @@ import { useAppStore } from "@/store/appStore";
 import { Button } from "./ui/button";
 import { MessageCircle } from "lucide-react";
 import ChatAssistant from "./ChatAssistant";
-import { toast } from "@/hooks/use-toast";
 
 interface LayoutProps {
   children: ReactNode;
@@ -17,10 +16,6 @@ const Layout = ({ children }: LayoutProps) => {
   
   const handleOpenChat = () => {
     setChatOpen(true);
-    toast({
-      title: "Strive Assistant activated",
-      description: "Ask questions about insights and platform performance",
-    });
   };
   
   return (

@@ -3,14 +3,34 @@ import { useState, useEffect, useRef } from "react";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CircleDot, MessageCircle } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { CircleDot, MessageCircle, X } from "lucide-react";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 type Message = {
   id: string;
   content: string;
   role: "user" | "assistant" | "system";
   timestamp: Date;
+  componentType?: "text" | "chart" | "table"; // Added component type for rich responses
+  data?: any; // Data for the component
 };
 
 type SuggestionPill = {
@@ -26,20 +46,105 @@ const suggestions: SuggestionPill[] = [
   { id: "4", text: "Recent insights", query: "Give me recent insights" },
 ];
 
+// Performance trend data
+const performanceTrendData = [
+  { month: "Jan", value: 400 },
+  { month: "Feb", value: 300 },
+  { month: "Mar", value: 600 },
+  { month: "Apr", value: 800 },
+  { month: "May", value: 500 },
+  { month: "Jun", value: 900 },
+  { month: "Jul", value: 750 },
+];
+
+// Task completion data
+const taskCompletionData = [
+  { week: "Week 1", rate: 82 },
+  { week: "Week 2", rate: 86 },
+  { week: "Week 3", rate: 90 },
+  { week: "Week 4", rate: 92 },
+];
+
+// Agent productivity data
+const agentProductivityData = [
+  { name: "Sales", completed: 45, pending: 10 },
+  { name: "Support", completed: 35, pending: 15 },
+  { name: "Technical", completed: 28, pending: 5 },
+  { name: "Marketing", completed: 22, pending: 12 },
+];
+
+// Insights data
+const insightsTableData = [
+  { insight: "Response time", value: "1.8 min", change: "-12%" },
+  { insight: "Task completion rate", value: "92%", change: "+7%" },
+  { insight: "Customer satisfaction", value: "4.7/5", change: "+0.2" },
+  { insight: "Agent efficiency", value: "89%", change: "+5%" },
+];
+
 // Mock responses for demonstration purposes
-const getMockResponse = (query: string): string => {
+const getMockResponse = (query: string): Message => {
   const lowerQuery = query.toLowerCase();
+  const id = Date.now() + 1;
   
   if (lowerQuery.includes("performance") || lowerQuery.includes("trend")) {
-    return "Performance trends show a 24% increase in task completion rate over the last 30 days. The average response time has decreased by 12% to 1.8 minutes.";
+    return {
+      id: id.toString(),
+      content: "Performance trends show a 24% increase in task completion rate over the last 30 days.",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "chart",
+      data: {
+        type: "line",
+        data: performanceTrendData,
+        xKey: "month",
+        yKey: "value",
+      }
+    };
   } else if (lowerQuery.includes("task completion") || lowerQuery.includes("completion rate")) {
-    return "Your current task completion rate is 92% which is above the team average of 85%. Great job keeping up with your tasks!";
+    return {
+      id: id.toString(),
+      content: "Your current task completion rate is 92% which is above the team average of 85%. Great job keeping up with your tasks!",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "chart",
+      data: {
+        type: "bar",
+        data: taskCompletionData,
+        xKey: "week",
+        yKey: "rate",
+      }
+    };
   } else if (lowerQuery.includes("agent") || lowerQuery.includes("productivity")) {
-    return "Agent productivity metrics show that the Sales agent has completed 45 tasks, Support has completed 35 tasks, and the Technical agent has completed 28 tasks this week.";
+    return {
+      id: id.toString(),
+      content: "Agent productivity metrics show the distribution of completed and pending tasks across different agent roles.",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "chart",
+      data: {
+        type: "bar",
+        data: agentProductivityData,
+        xKey: "name",
+        yKey: ["completed", "pending"],
+      }
+    };
   } else if (lowerQuery.includes("insight")) {
-    return "Recent insights suggest adjusting task allocation to balance workload across all agents. We recommend increasing training for support agents to reduce response time.";
+    return {
+      id: id.toString(),
+      content: "Here are the recent insights from the platform:",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "table",
+      data: insightsTableData,
+    };
   } else {
-    return "I'm sorry, but that query is beyond the scope of the Strive platform. I can help with insights, performance metrics, and agent productivity. Please try asking about those topics.";
+    return {
+      id: id.toString(),
+      content: "I'm sorry, but that query is beyond the scope of the Strive platform. I can help with insights, performance metrics, and agent productivity. Please try asking about those topics.",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "text",
+    };
   }
 };
 
@@ -93,12 +198,7 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
     
     // Simulate processing delay
     setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: getMockResponse(messageContent),
-        role: "assistant",
-        timestamp: new Date(),
-      };
+      const assistantMessage = getMockResponse(messageContent);
       setMessages(prev => [...prev, assistantMessage]);
       setIsLoading(false);
     }, 3000);
@@ -106,6 +206,94 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
 
   const handleSuggestionClick = (suggestion: SuggestionPill) => {
     handleSendMessage(suggestion.query);
+  };
+
+  const handleClose = () => {
+    // Reset to default state when closing
+    setMessages([]);
+    setInput("");
+    onOpenChange(false);
+  };
+
+  // Helper function to render the appropriate component based on message type
+  const renderMessageComponent = (message: Message) => {
+    if (message.role === "user" || !message.componentType || message.componentType === "text") {
+      return <p className="text-sm">{message.content}</p>;
+    }
+    
+    if (message.componentType === "chart") {
+      const { type, data, xKey, yKey } = message.data;
+      const chartHeight = 200;
+      
+      return (
+        <div className="w-full">
+          <p className="text-sm mb-2">{message.content}</p>
+          <div className="bg-white rounded-md p-2 mt-2 border">
+            <ResponsiveContainer width="100%" height={chartHeight}>
+              {type === "line" ? (
+                <LineChart data={data}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey={xKey} />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey={yKey} stroke="#ea580c" strokeWidth={2} />
+                </LineChart>
+              ) : (
+                <BarChart data={data}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey={xKey} />
+                  <YAxis />
+                  <Tooltip />
+                  {Array.isArray(yKey) ? (
+                    yKey.map((key, index) => (
+                      <Bar 
+                        key={key} 
+                        dataKey={key} 
+                        fill={index === 0 ? "#ea580c" : "#e2e8f0"} 
+                      />
+                    ))
+                  ) : (
+                    <Bar dataKey={yKey} fill="#ea580c" />
+                  )}
+                </BarChart>
+              )}
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
+    
+    if (message.componentType === "table") {
+      return (
+        <div className="w-full">
+          <p className="text-sm mb-2">{message.content}</p>
+          <div className="bg-white rounded-md mt-2 border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Metric</TableHead>
+                  <TableHead>Value</TableHead>
+                  <TableHead>Change</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {message.data.map((row: any, index: number) => (
+                  <TableRow key={index}>
+                    <TableCell>{row.insight}</TableCell>
+                    <TableCell>{row.value}</TableCell>
+                    <TableCell className={row.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
+                      {row.change}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      );
+    }
+    
+    return <p className="text-sm">{message.content}</p>;
   };
 
   return (
@@ -117,9 +305,14 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
               <MessageCircle className="h-5 w-5 text-primary" />
               <DrawerTitle>Strive Assistant</DrawerTitle>
             </div>
-            <div className="flex items-center gap-1 text-xs text-green-600">
-              <CircleDot className="h-3 w-3" />
-              <span>Active</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 text-xs text-green-600">
+                <CircleDot className="h-3 w-3" />
+                <span>Active</span>
+              </div>
+              <DrawerClose onClick={handleClose}>
+                <X className="h-4 w-4" />
+              </DrawerClose>
             </div>
           </div>
         </DrawerHeader>
@@ -149,7 +342,7 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
                           : "bg-muted"
                       }`}
                     >
-                      <p className="text-sm">{message.content}</p>
+                      {renderMessageComponent(message)}
                     </div>
                   </div>
                 ))}
