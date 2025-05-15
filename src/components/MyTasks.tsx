@@ -4,6 +4,7 @@ import { attentionItems } from "@/data/mockData";
 import { FileSearch2, Filter, BookOpenText, AlertTriangle, LucideProps } from "lucide-react";
 import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Helper for Lucide icon
 const getLucideIcon = (iconName: string) => {
@@ -20,7 +21,23 @@ type AttentionItem = typeof attentionItems[0];
 
 const MyTasks = () => {
   const [hiddenItems, setHiddenItems] = useState<number[]>([]);
-  const handleHide = (id: number) => setHiddenItems(prev => [...prev, id]);
+  const navigate = useNavigate();
+
+  const handleCta = (action: string | undefined, url: string | undefined, itemId?: number) => {
+    if (!action) return;
+    switch (action) {
+      case 'navigateToAgent':
+        if (url) navigate(url);
+        break;
+      case 'hideCard':
+        if (itemId !== undefined) setHiddenItems(prev => [...prev, itemId]);
+        break;
+      case 'navigateToReauth':
+        navigate('/reauth/google');
+        break;
+      default: console.warn('Unknown CTA action:', action);
+    }
+  };
 
   return (
     <div className="space-y-8 px-4">
@@ -53,8 +70,8 @@ const MyTasks = () => {
                 <p className={cn("mt-6 font-medium text-sm", item.descriptionColor)}>{item.description}</p>
               </CardContent>
               <CardFooter className="flex gap-2 mt-auto border-t pt-4">
-                <Button className="flex-1">{item.primaryCta}</Button>
-                <Button variant="outline" className="flex-1" onClick={() => handleHide(item.id)}>{item.secondaryCta}</Button>
+                <Button className="flex-1" onClick={() => handleCta(item.primaryCtaAction, item.agentPageUrl)}>{item.primaryCta}</Button>
+                <Button variant="outline" className="flex-1" onClick={() => handleCta(item.secondaryCtaAction, item.agentPageUrl, item.id)}>{item.secondaryCta}</Button>
               </CardFooter>
             </Card>
           );

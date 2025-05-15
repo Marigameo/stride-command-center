@@ -2,7 +2,7 @@ import { ReactNode, useState } from "react";
 import Sidebar from "./Sidebar";
 import { useAppStore } from "@/store/appStore";
 import { Button } from "./ui/button";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Sparkles } from "lucide-react";
 import ChatAssistant from "./ChatAssistant";
 import { Outlet } from "react-router-dom";
 
@@ -22,13 +22,12 @@ const Layout = () => {
           <div className="flex justify-between items-center mb-6">
             <div></div> {/* Left side empty for now */}
             <Button 
-              variant="outline" 
               size="sm" 
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 text-white hover:from-orange-600 hover:via-orange-500 hover:to-orange-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-gradient-x font-medium px-4 py-2 rounded-full border border-orange-400/30"
               onClick={handleOpenChat}
             >
-              <MessageCircle className="w-4 h-4" />
-              Ask Strive
+              <Sparkles className="w-4 h-4" />
+              Ask Strive AI
             </Button>
           </div>
           <div className="flex-1">

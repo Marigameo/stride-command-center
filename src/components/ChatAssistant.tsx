@@ -39,110 +39,118 @@ type SuggestionPill = {
 };
 
 const suggestions: SuggestionPill[] = [
-  { id: "1", text: "Show performance trends", query: "Show me performance trends" },
-  { id: "2", text: "Task completion rate", query: "What's my task completion rate?" },
-  { id: "3", text: "Agent productivity", query: "How's agent productivity this week?" },
-  { id: "4", text: "Recent insights", query: "Give me recent insights" },
+  { id: "1", text: "Agent Status", query: "What are my agents currently working on?" },
+  { id: "2", text: "Critical Tasks", query: "Show me critical tasks that need attention" },
+  { id: "3", text: "Workforce Efficiency", query: "How efficient is my workforce today?" },
+  { id: "4", text: "Optimization Tips", query: "How can I optimize my workforce?" },
 ];
 
-// Performance trend data
-const performanceTrendData = [
-  { month: "Jan", value: 400 },
-  { month: "Feb", value: 300 },
-  { month: "Mar", value: 600 },
-  { month: "Apr", value: 800 },
-  { month: "May", value: 500 },
-  { month: "Jun", value: 900 },
-  { month: "Jul", value: 750 },
-];
+// Updated performance trend data to match the new insights
+const performanceTrendData = (() => {
+  const last7Days = [...Array(7)].map((_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    return date.toLocaleDateString('en-US', { weekday: 'short' });
+  }).reverse();
 
-// Task completion data
+  return last7Days.map((day) => ({
+    name: day,
+    completionRate: 75 + Math.random() * 20,
+    efficiency: 80 + Math.random() * 15,
+  }));
+})();
+
+// Updated task completion data
 const taskCompletionData = [
-  { week: "Week 1", rate: 82 },
-  { week: "Week 2", rate: 86 },
-  { week: "Week 3", rate: 90 },
-  { week: "Week 4", rate: 92 },
+  { category: "Critical", count: 2, status: "Pending" },
+  { category: "High Priority", count: 5, status: "In Progress" },
+  { category: "Routine", count: 12, status: "Active" },
+  { category: "Automated", count: 25, status: "Running" },
 ];
 
-// Agent productivity data
+// Updated agent productivity data to match the new workforce insights
 const agentProductivityData = [
-  { name: "Sales", completed: 45, pending: 10 },
-  { name: "Support", completed: 35, pending: 15 },
-  { name: "Technical", completed: 28, pending: 5 },
-  { name: "Marketing", completed: 22, pending: 12 },
+  { name: "Keyword Optimizer", efficiency: 92, tasks: 15, status: "Active" },
+  { name: "Conversion Funnel", efficiency: 88, tasks: 8, status: "Active" },
+  { name: "Books Reconciler", efficiency: 78, tasks: 27, status: "Waiting" },
 ];
 
-// Insights data
+// Updated insights data
 const insightsTableData = [
-  { insight: "Response time", value: "1.8 min", change: "-12%" },
-  { insight: "Task completion rate", value: "92%", change: "+7%" },
-  { insight: "Customer satisfaction", value: "4.7/5", change: "+0.2" },
-  { insight: "Agent efficiency", value: "89%", change: "+5%" },
+  { insight: "Workforce Utilization", value: "85%", change: "+12%", status: "Optimal" },
+  { insight: "Task Completion Rate", value: "92%", change: "+7%", status: "Above Target" },
+  { insight: "Average Response Time", value: "1.8 min", change: "-15%", status: "Excellent" },
+  { insight: "Automation Rate", value: "78%", change: "+5%", status: "Improving" },
 ];
 
-// Mock responses for demonstration purposes
+// Updated mock responses
 const getMockResponse = (query: string): Message => {
   const lowerQuery = query.toLowerCase();
   const id = Date.now() + 1;
   
-  if (lowerQuery.includes("performance") || lowerQuery.includes("trend")) {
+  if (lowerQuery.includes("working on") || lowerQuery.includes("status")) {
     return {
       id: id.toString(),
-      content: "Performance trends show a 24% increase in task completion rate over the last 30 days.",
+      content: "Here's the current status of your AI workforce:",
       role: "assistant",
       timestamp: new Date(),
-      componentType: "chart",
-      data: {
-        type: "line",
-        data: performanceTrendData,
-        xKey: "month",
-        yKey: "value",
-      }
+      componentType: "table",
+      data: agentProductivityData.map(agent => ({
+        insight: agent.name,
+        value: `${agent.tasks} tasks`,
+        change: `${agent.efficiency}% efficient`,
+        status: agent.status
+      }))
     };
-  } else if (lowerQuery.includes("task completion") || lowerQuery.includes("completion rate")) {
+  } else if (lowerQuery.includes("critical") || lowerQuery.includes("attention")) {
     return {
       id: id.toString(),
-      content: "Your current task completion rate is 92% which is above the team average of 85%. Great job keeping up with your tasks!",
+      content: "Here are the tasks requiring immediate attention:",
       role: "assistant",
       timestamp: new Date(),
       componentType: "chart",
       data: {
         type: "bar",
         data: taskCompletionData,
-        xKey: "week",
-        yKey: "rate",
+        xKey: "category",
+        yKey: "count"
       }
     };
-  } else if (lowerQuery.includes("agent") || lowerQuery.includes("productivity")) {
+  } else if (lowerQuery.includes("efficient") || lowerQuery.includes("performance")) {
     return {
       id: id.toString(),
-      content: "Agent productivity metrics show the distribution of completed and pending tasks across different agent roles.",
+      content: "Your workforce efficiency over the last 7 days:",
       role: "assistant",
       timestamp: new Date(),
       componentType: "chart",
       data: {
-        type: "bar",
-        data: agentProductivityData,
+        type: "line",
+        data: performanceTrendData,
         xKey: "name",
-        yKey: ["completed", "pending"],
+        yKey: ["completionRate", "efficiency"]
       }
     };
-  } else if (lowerQuery.includes("insight")) {
+  } else if (lowerQuery.includes("optimize") || lowerQuery.includes("improvement")) {
     return {
       id: id.toString(),
-      content: "Here are the recent insights from the platform:",
+      content: "Based on current metrics, here are the key areas for optimization:",
       role: "assistant",
       timestamp: new Date(),
       componentType: "table",
-      data: insightsTableData,
+      data: [
+        { insight: "Task Distribution", value: "Uneven", change: "High priority", status: "Action needed" },
+        { insight: "Agent Utilization", value: "85%", change: "Near capacity", status: "Monitor" },
+        { insight: "Automation Rules", value: "78%", change: "Can improve", status: "Review" },
+        { insight: "Response Time", value: "1.8 min", change: "Optimal", status: "Maintain" }
+      ]
     };
   } else {
     return {
       id: id.toString(),
-      content: "I'm sorry, but that query is beyond the scope of the Strive platform. I can help with insights, performance metrics, and agent productivity. Please try asking about those topics.",
+      content: "I can help you monitor and optimize your AI workforce. Try asking about agent status, critical tasks, workforce efficiency, or optimization opportunities.",
       role: "assistant",
       timestamp: new Date(),
-      componentType: "text",
+      componentType: "text"
     };
   }
 };
@@ -235,7 +243,19 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
                   <XAxis dataKey={xKey} />
                   <YAxis />
                   <Tooltip />
-                  <Line type="monotone" dataKey={yKey} stroke="#ea580c" strokeWidth={2} />
+                  {Array.isArray(yKey) ? (
+                    yKey.map((key, index) => (
+                      <Line 
+                        key={key}
+                        type="monotone"
+                        dataKey={key}
+                        stroke={index === 0 ? "#ea580c" : "#3b82f6"}
+                        strokeWidth={2}
+                      />
+                    ))
+                  ) : (
+                    <Line type="monotone" dataKey={yKey} stroke="#ea580c" strokeWidth={2} />
+                  )}
                 </LineChart>
               ) : (
                 <BarChart data={data}>
@@ -272,7 +292,8 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
                 <TableRow>
                   <TableHead>Metric</TableHead>
                   <TableHead>Value</TableHead>
-                  <TableHead>Change</TableHead>
+                  <TableHead>Change/Efficiency</TableHead>
+                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -280,8 +301,22 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
                   <TableRow key={index}>
                     <TableCell>{row.insight}</TableCell>
                     <TableCell>{row.value}</TableCell>
-                    <TableCell className={row.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
+                    <TableCell className={
+                      row.change.includes('+') ? 'text-green-600' : 
+                      row.change.includes('-') ? 'text-red-600' : 
+                      'text-gray-600'
+                    }>
                       {row.change}
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${
+                        row.status === 'Active' ? 'bg-green-100 text-green-800' :
+                        row.status === 'Waiting' ? 'bg-orange-100 text-orange-800' :
+                        row.status === 'Action needed' ? 'bg-red-100 text-red-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {row.status}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

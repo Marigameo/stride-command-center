@@ -51,13 +51,13 @@ const CommandCenter = () => {
     if (!action) return;
     switch (action) {
       case 'navigateToAgent':
-        if (url) window.location.href = url;
+        if (url) navigate(url);
         break;
       case 'hideCard':
         if (itemId !== undefined) setHiddenItems(prev => [...prev, itemId]);
         break;
       case 'navigateToReauth':
-        if (url) navigate(url);
+        navigate('/reauth/google');
         break;
       default: console.warn('Unknown CTA action:', action);
     }
@@ -114,8 +114,8 @@ const CommandCenter = () => {
                           <p className={cn("mt-6 font-medium text-sm", item.descriptionColor)}>{item.description}</p>
                         </CardContent>
                         <CardFooter className="flex gap-2 mt-auto border-t pt-4">
-                          <Button className="flex-1" onClick={() => handleCta(item.primaryCtaAction, item.agentPageUrl || item.reauthPageUrl, item.id)}>{item.primaryCta}</Button>
-                          <Button variant="outline" className="flex-1" onClick={() => handleCta(item.secondaryCtaAction, item.agentPageUrl || item.reauthPageUrl, item.id)}>{item.secondaryCta}</Button>
+                          <Button className="flex-1" onClick={() => handleCta(item.primaryCtaAction, item.agentPageUrl)}>{item.primaryCta}</Button>
+                          <Button variant="outline" className="flex-1" onClick={() => handleCta(item.secondaryCtaAction, item.agentPageUrl, item.id)}>{item.secondaryCta}</Button>
                         </CardFooter>
                       </Card>
                     </CarouselItem>

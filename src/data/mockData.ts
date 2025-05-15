@@ -43,8 +43,9 @@ export const attentionItems = [
     description: "27 Expenses Pending",
     actionTypeColor: "text-red-600",
     descriptionColor: "text-red-500",
-    primaryCtaAction: "navigateToReauth",
+    primaryCtaAction: "navigateToAgent",
     secondaryCtaAction: "navigateToReauth",
+    agentPageUrl: "/agents/books-reconciler",
     reauthPageUrl: "/reauth/books-reconciler"
   }
 ];

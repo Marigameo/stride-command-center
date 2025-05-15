@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,357 +13,350 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Plus, X, RefreshCcw, Ban } from "lucide-react";
+import { useState, KeyboardEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
-const profileFormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+const brandFormSchema = z.object({
+  company: z.string().min(2, {
+    message: "Company name must be at least 2 characters.",
   }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
+  brandDescription: z.string().min(10, {
+    message: "Brand description must be at least 10 characters.",
   }),
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
+  geographiesServed: z.array(z.string()).min(1, {
+    message: "Please select at least one geography.",
   }),
+  competitors: z.string(),
 });
 
-const notificationsFormSchema = z.object({
-  emailNotifications: z.boolean(),
-  pushNotifications: z.boolean(),
-  taskReminders: z.boolean(),
-  marketingEmails: z.boolean(),
+const connectionsFormSchema = z.object({
+  googleAds: z.boolean(),
+  googleDrive: z.boolean(),
+  zohoBooks: z.boolean(),
+  hubspot: z.boolean(),
+  slack: z.boolean(),
 });
 
-const securityFormSchema = z.object({
-  currentPassword: z.string().min(1, { message: "Current password is required" }),
-  newPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  confirmNewPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
-}).refine((data) => data.newPassword === data.confirmNewPassword, {
-  message: "Passwords do not match",
-  path: ["confirmNewPassword"],
-});
+type BrandFormValues = z.infer<typeof brandFormSchema>;
+type ConnectionsFormValues = z.infer<typeof connectionsFormSchema>;
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
-type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
-type SecurityFormValues = z.infer<typeof securityFormSchema>;
+const geographies = ["USA", "Central America", "Canada", "India"];
+
+// Connection data with more details
+const connections = [
+  {
+    id: "googleAds",
+    name: "Google Ads",
+    logo: "https://www.gstatic.com/images/branding/product/2x/ads_48dp.png",
+    description: "Manage your advertising campaigns",
+    isActive: true,
+    lastAuth: "2024-02-15",
+  },
+  {
+    id: "googleDrive",
+    name: "Google Drive",
+    logo: "https://ssl.gstatic.com/images/branding/product/2x/drive_48dp.png",
+    description: "Access and store files",
+    isActive: true,
+    lastAuth: "2024-03-01",
+  },
+  {
+    id: "zohoBooks",
+    name: "Zoho Books",
+    logo: "https://zoho.codafish.net/wp-content/uploads/2022/08/books-512-1.png",
+    description: "Financial management and accounting",
+    isActive: false,
+    lastAuth: "2024-01-20",
+  },
+  {
+    id: "hubspot",
+    name: "Hubspot",
+    logo: "https://www.hubspot.com/hubfs/HubSpot_Logos/HubSpot-Inversed-Favicon.png",
+    description: "CRM and marketing automation",
+    isActive: true,
+    lastAuth: "2024-03-10",
+  },
+  {
+    id: "slack",
+    name: "Slack",
+    logo: "https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png",
+    description: "Team communication and notifications",
+    isActive: true,
+    lastAuth: "2024-02-28",
+  },
+];
 
 const AccountSettings = () => {
-  const profileForm = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+  const [competitors, setCompetitors] = useState<string[]>([
+    "Microsoft",
+    "Apple",
+    "Amazon",
+    "Meta",
+    "OpenAI"
+  ]);
+  const [competitorInput, setCompetitorInput] = useState("");
+  const navigate = useNavigate();
+
+  const brandForm = useForm<BrandFormValues>({
+    resolver: zodResolver(brandFormSchema),
     defaultValues: {
-      username: "strive_admin",
-      email: "admin@strivelabs.com",
-      name: "Admin User",
+      company: "Google",
+      brandDescription: "Google's mission is to organize the world's information and make it universally accessible and useful. Since our founding in 1998, Google has grown by leaps and bounds. From offering search in a single language we now offer dozens of products and services—including various forms of advertising and web applications for all kinds of tasks—in scores of languages.",
+      geographiesServed: ["USA", "Canada", "India"],
+      competitors: "",
     },
   });
 
-  const notificationsForm = useForm<NotificationsFormValues>({
-    resolver: zodResolver(notificationsFormSchema),
+  const connectionsForm = useForm<ConnectionsFormValues>({
+    resolver: zodResolver(connectionsFormSchema),
     defaultValues: {
-      emailNotifications: true,
-      pushNotifications: true,
-      taskReminders: true,
-      marketingEmails: false,
+      googleAds: false,
+      googleDrive: false,
+      zohoBooks: false,
+      hubspot: false,
+      slack: false,
     },
   });
 
-  const securityForm = useForm<SecurityFormValues>({
-    resolver: zodResolver(securityFormSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmNewPassword: "",
-    },
-  });
+  const handleCompetitorKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && competitorInput.trim()) {
+      e.preventDefault();
+      addCompetitor();
+    }
+  };
 
-  function onProfileSubmit(data: ProfileFormValues) {
-    console.log("Profile data submitted:", data);
+  const addCompetitor = () => {
+    if (competitorInput.trim()) {
+      // Split by commas and filter out empty strings
+      const newCompetitors = competitorInput
+        .split(',')
+        .map(comp => comp.trim())
+        .filter(comp => comp.length > 0);
+      
+      // Add all new competitors
+      setCompetitors([...competitors, ...newCompetitors]);
+      setCompetitorInput("");
+    }
+  };
+
+  const removeCompetitor = (index: number) => {
+    setCompetitors(competitors.filter((_, i) => i !== index));
+  };
+
+  function onBrandSubmit(data: BrandFormValues) {
+    console.log("Brand data submitted:", data);
     toast({
-      title: "Profile updated",
-      description: "Your profile has been updated successfully.",
+      title: "Brand details updated",
+      description: "Your brand information has been saved successfully.",
     });
   }
 
-  function onNotificationsSubmit(data: NotificationsFormValues) {
-    console.log("Notification settings submitted:", data);
+  function onConnectionsSubmit(data: ConnectionsFormValues) {
+    console.log("Connections settings submitted:", data);
     toast({
-      title: "Notification settings updated",
-      description: "Your notification preferences have been saved.",
+      title: "Connections updated",
+      description: "Your connection preferences have been saved.",
     });
   }
 
-  function onSecuritySubmit(data: SecurityFormValues) {
-    console.log("Security settings submitted:", data);
-    toast({
-      title: "Password updated",
-      description: "Your password has been changed successfully.",
-    });
-  }
+  const handleReauth = (connectionId: string) => {
+    navigate('/reauth');
+  };
 
-  function onDeleteAccount() {
+  const handleRevoke = (connectionId: string) => {
     toast({
-      title: "Account deletion requested",
-      description: "Your account deletion request has been submitted for processing.",
-      variant: "destructive",
+      title: "Access Revoked",
+      description: `Access to ${connectionId} has been revoked.`,
     });
-  }
+  };
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-6">Account Settings</h1>
+    <div className="space-y-8 my-6">
+      <h1 className="text-2xl font-semibold">Account Settings</h1>
 
-      <Tabs defaultValue="profile" className="space-y-6">
+      <Tabs defaultValue="brand" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="brand">Brand Details</TabsTrigger>
+          <TabsTrigger value="connections">Connections</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile">
+        <TabsContent value="brand">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle>Brand Details</CardTitle>
               <CardDescription>
-                Update your account information and public profile.
+                Configure your brand information and market presence.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Form {...profileForm}>
-                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={profileForm.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Your name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              <Form {...brandForm}>
+                <form onSubmit={brandForm.handleSubmit(onBrandSubmit)} className="space-y-6">
+                  <FormField
+                    control={brandForm.control}
+                    name="company"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter your company name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={profileForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Username" {...field} />
-                          </FormControl>
-                          <FormDescription>
-                            This is your public display name.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={brandForm.control}
+                    name="brandDescription"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Brand Description</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Describe your brand and its unique value proposition"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={profileForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem className="md:col-span-2">
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Email address" type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={brandForm.control}
+                    name="geographiesServed"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Geographies Served</FormLabel>
+                        <FormControl>
+                          <div className="grid grid-cols-2 gap-4">
+                            {geographies.map((geography) => (
+                              <div key={geography} className="flex items-center space-x-2">
+                                <Switch
+                                  checked={field.value.includes(geography)}
+                                  onCheckedChange={(checked) => {
+                                    const newValue = checked
+                                      ? [...field.value, geography]
+                                      : field.value.filter((g) => g !== geography);
+                                    field.onChange(newValue);
+                                  }}
+                                />
+                                <span>{geography}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                  <div className="flex justify-end">
-                    <Button type="submit">Save Changes</Button>
-                  </div>
+                  <FormItem>
+                    <FormLabel>Competitors</FormLabel>
+                    <div className="flex gap-2">
+                      <Input
+                        value={competitorInput}
+                        onChange={(e) => setCompetitorInput(e.target.value)}
+                        onKeyDown={handleCompetitorKeyDown}
+                        placeholder="Add competitors (comma-separated or press Enter)"
+                      />
+                      <Button 
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={addCompetitor}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {competitors.map((competitor, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          {competitor}
+                          <button
+                            type="button"
+                            onClick={() => removeCompetitor(index)}
+                            className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </FormItem>
+
+                  <Button type="submit">Save Brand Details</Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="notifications">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Settings</CardTitle>
-              <CardDescription>
-                Configure how and when you'll receive notifications.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...notificationsForm}>
-                <form onSubmit={notificationsForm.handleSubmit(onNotificationsSubmit)} className="space-y-6">
-                  <FormField
-                    control={notificationsForm.control}
-                    name="emailNotifications"
-                    render={({ field }) => (
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <FormLabel className="text-base">Email Notifications</FormLabel>
-                          <FormDescription>Receive updates via email.</FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
+        <TabsContent value="connections">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {connections.map((connection) => (
+              <Card key={connection.id}>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <img
+                        src={connection.logo}
+                        alt={`${connection.name} logo`}
+                        className="w-8 h-8 object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = `https://ui-avatars.com/api/?name=${connection.name}&background=random`;
+                        }}
+                      />
+                      <div>
+                        <CardTitle className="text-lg">{connection.name}</CardTitle>
+                        <CardDescription>{connection.description}</CardDescription>
                       </div>
-                    )}
-                  />
-                  <Separator />
-                  <FormField
-                    control={notificationsForm.control}
-                    name="pushNotifications"
-                    render={({ field }) => (
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <FormLabel className="text-base">Push Notifications</FormLabel>
-                          <FormDescription>Receive notifications in-app.</FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </div>
-                    )}
-                  />
-                  <Separator />
-                  <FormField
-                    control={notificationsForm.control}
-                    name="taskReminders"
-                    render={({ field }) => (
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <FormLabel className="text-base">Task Reminders</FormLabel>
-                          <FormDescription>Get reminders for upcoming tasks.</FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </div>
-                    )}
-                  />
-                  <Separator />
-                  <FormField
-                    control={notificationsForm.control}
-                    name="marketingEmails"
-                    render={({ field }) => (
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <FormLabel className="text-base">Marketing Emails</FormLabel>
-                          <FormDescription>Receive marketing and promotional emails.</FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </div>
-                    )}
-                  />
-                  <div className="flex justify-end">
-                    <Button type="submit">Save Preferences</Button>
+                    </div>
+                    <Badge variant={connection.isActive ? "default" : "secondary"}>
+                      {connection.isActive ? "Active" : "Inactive"}
+                    </Badge>
                   </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="security">
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>
-                Manage your security preferences and account access.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium">Change Password</h3>
-                  <Form {...securityForm}>
-                    <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)} className="mt-4 space-y-4">
-                      <FormField
-                        control={securityForm.control}
-                        name="currentPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Current Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={securityForm.control}
-                        name="newPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>New Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={securityForm.control}
-                        name="confirmNewPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Confirm New Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type="submit">Update Password</Button>
-                    </form>
-                  </Form>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
-                  <p className="text-sm text-gray-500 mt-1 mb-4">
-                    Add an extra layer of security to your account.
-                  </p>
-                  <Button variant="outline">Set Up 2FA</Button>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-medium text-red-600">Danger Zone</h3>
-                  <p className="text-sm text-gray-500 mt-1 mb-4">
-                    Permanently delete your account and all associated data.
-                  </p>
-                  <Button variant="destructive" onClick={onDeleteAccount}>Delete Account</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-gray-500 mb-4">
+                    Last authenticated: {connection.lastAuth}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                      onClick={() => handleReauth(connection.id)}
+                    >
+                      <RefreshCcw className="h-4 w-4" />
+                      Reauthorize
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleRevoke(connection.id)}
+                    >
+                      <Ban className="h-4 w-4" />
+                      Revoke
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -12,8 +12,33 @@ import Insights from "@/components/Insights";
 import MyWorkforce from "@/components/MyWorkforce";
 import AccountSettings from "@/components/AccountSettings";
 import Layout from "@/components/Layout";
+import BooksReconcilerReview from "@/pages/agents/BooksReconcilerReview";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
+
+// External agent URLs
+const AGENT_URLS = {
+  keywordOptimizer: "https://preview--keyword-review-pilot.lovable.app/",
+  conversionFunnel: "https://kzmkh0380c33wiacads9.lite.vusercontent.net/"
+};
+
+// Component to handle external redirects
+const ExternalRedirect = ({ to }: { to: string }) => {
+  useEffect(() => {
+    window.open(to, '_blank');
+    window.history.back(); // Go back to previous page after opening new tab
+  }, [to]);
+
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-2">Opening external page...</h2>
+        <p className="text-gray-600">If nothing happens, <a href={to} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">click here</a></p>
+      </div>
+    </div>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -31,9 +56,17 @@ const App = () => (
             <Route path="/my-workforce" element={<MyWorkforce />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/marketplace" element={<div className="flex items-center justify-center min-h-[50vh]"><div className="text-center"><h1 className="text-2xl font-semibold mb-3">Marketplace</h1><p className="text-gray-600">Coming soon! Our marketplace will feature agent templates and extensions.</p></div></div>} />
+            
+            {/* Agent Review Pages */}
+            <Route path="/agents/keyword-optimizer" element={<ExternalRedirect to={AGENT_URLS.keywordOptimizer} />} />
+            <Route path="/agents/conversion-funnel-optimizer" element={<ExternalRedirect to={AGENT_URLS.conversionFunnel} />} />
+            <Route path="/agents/books-reconciler" element={<BooksReconcilerReview />} />
+
+            {/* Reauth page inside layout */}
+            <Route path="/reauth/:service" element={<ReauthPage />} />
           </Route>
-          {/* Special routes outside layout */}
-          <Route path="/reauth/:service" element={<ReauthPage />} />
+          
+          {/* 404 page */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

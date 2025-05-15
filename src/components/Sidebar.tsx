@@ -41,15 +41,17 @@ const Sidebar = () => {
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center">
             {!sidebarCollapsed && (
-              <img
-                src="/strivelabs-logo.svg"
-                alt="StriveLabs"
-                style={{
-                  width: 120,
-                  height: 40,
-                  objectFit: 'contain'
-                }}
-              />
+              <Link to="/command-center" className="hover:opacity-80 transition-opacity">
+                <img
+                  src="/strivelabs-logo.svg"
+                  alt="StriveLabs"
+                  style={{
+                    width: 120,
+                    height: 40,
+                    objectFit: 'contain'
+                  }}
+                />
+              </Link>
             )}
           </div>
           <button
