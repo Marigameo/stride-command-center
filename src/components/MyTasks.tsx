@@ -1,23 +1,11 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { attentionItems } from "@/data/mockData";
-import { FileSearch2, Filter, BookOpenText, AlertTriangle, LucideProps } from "lucide-react";
 import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Helper for Lucide icon
-const getLucideIcon = (iconName: string) => {
-  switch (iconName) {
-    case 'FileSearch2': return FileSearch2;
-    case 'Funnel': return Filter;
-    case 'BookOpenText': return BookOpenText;
-    case 'AlertTriangle': return AlertTriangle;
-    default: return null;
-  }
-};
-
-type AttentionItem = typeof attentionItems[0];
+type AttentionItem = Omit<typeof attentionItems[0], 'lucideIcon'>;
 
 const MyTasks = () => {
   const [hiddenItems, setHiddenItems] = useState<number[]>([]);
@@ -44,7 +32,6 @@ const MyTasks = () => {
       <h1 className="text-2xl font-semibold mb-6">My Tasks</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {attentionItems.filter(item => !hiddenItems.includes(item.id)).map((item: AttentionItem) => {
-          const IconComponent = item.lucideIcon ? getLucideIcon(item.lucideIcon) : null;
           return (
             <Card key={item.id} className={cn("flex flex-col h-[250px] transition-all duration-300 ease-in-out", hiddenItems.includes(item.id) ? 'opacity-0 max-h-0 scale-y-0 !p-0 !m-0 border-none' : 'opacity-100 max-h-[500px] scale-y-100')} style={{ transformOrigin: 'top' }}>
               <CardHeader className="pb-2">
@@ -62,8 +49,8 @@ const MyTasks = () => {
               </CardHeader>
               <CardContent className="flex-grow">
                 <div className="flex items-center gap-3 my-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg">
-                    {IconComponent ? <IconComponent size={24} /> : item.agentLogo}
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg overflow-hidden">
+                    <img src={item.agentLogo} alt={item.agentName} className="w-full h-full object-cover" />
                   </div>
                   <div className="font-medium text-base">{item.agentName}</div>
                 </div>
