@@ -94,7 +94,7 @@ const CommandCenter = () => {
                         </CardHeader>
                         <CardContent className="flex-grow">
                           <div className="flex items-center gap-3 my-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg overflow-hidden">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg overflow-hidden">
                               <img src={item.agentLogo} alt={item.agentName} className="w-full h-full object-cover" />
                             </div>
                             <div className="font-medium text-base">{item.agentName}</div>
@@ -182,7 +182,7 @@ const CommandCenter = () => {
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-lg overflow-hidden">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg overflow-hidden">
                         <img src={agent.agentLogo} alt={agent.name} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="font-medium text-base">{agent.name}</h3>

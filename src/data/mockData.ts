@@ -3,7 +3,7 @@ export const attentionItems = [
     id: 1,
     actionType: "Approval Required",
     agentName: "Keyword Optimizer",
-    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png",
+    agentLogo: "/avatars/avatar1.png",
     impact: "High",
     primaryCta: "Review",
     secondaryCta: "Defer",
@@ -18,7 +18,7 @@ export const attentionItems = [
     id: 2,
     actionType: "Anomaly Detected",
     agentName: "Conversion Funnel Optimizer",
-    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_1.png",
+    agentLogo: "/avatars/avatar2.png",
     impact: "Critical",
     primaryCta: "View Anomaly",
     secondaryCta: "Diagnose",
@@ -33,7 +33,7 @@ export const attentionItems = [
     id: 3,
     actionType: "Unblocking Required",
     agentName: "Books Reconciler",
-    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_16.png",
+    agentLogo: "/avatars/avatar3.png",
     impact: "Critical",
     primaryCta: "View Error",
     secondaryCta: "Reauth",
@@ -78,31 +78,31 @@ export const agentsGlance = [
   {
     id: 1,
     name: "Keyword Optimizer",
-    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png",
+    agentLogo: "/avatars/avatar1.png",
     status: "Waiting",
     currentTask: "Optimizing Holiday Campaign",
     progress: 65,
     metric: "+$524 in savings",
     cta: "Review",
     ctaAction: "navigateToAgent",
-    agentPageUrl: "/agents/keyword-optimizer"
+    agentPageUrl: "https://keyword-optimizer.vercel.app/"
   },
   {
     id: 2,
     name: "Conversion Funnel Optimizer",
-    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_1.png",
+    agentLogo: "/avatars/avatar2.png",
     status: "Idle",
     lastCompleted: "A/B Test Concluded",
     progress: 100,
     metric: "-34% Leads WoW",
     cta: "Review",
     ctaAction: "navigateToAgent",
-    agentPageUrl: "/agents/conversion-funnel-optimizer"
+    agentPageUrl: "https://kzmkh0380c33wiacads9.lite.vusercontent.net/"
   },
   {
     id: 3,
     name: "Books Reconciler",
-    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_16.png",
+    agentLogo: "/avatars/avatar3.png",
     status: "Active",
     currentTask: "Reconciling Q3 Expenses",
     progress: 30,
@@ -114,14 +114,14 @@ export const agentsGlance = [
   {
     id: 4,
     name: "Blog Content Strategizer",
-    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_22.png",
+    agentLogo: "/avatars/avatar4.png",
     status: "Active",
     currentTask: "Creating outline for Amazon Marketplace",
     progress: 33,
     metric: "5 blog posts to be picked",
     cta: "View Outline",
     ctaAction: "navigateToAgent",
-    agentPageUrl: "/agents/blog-strategizer"
+    agentPageUrl: "/agents/books-reconciler"
   }
 ];
 

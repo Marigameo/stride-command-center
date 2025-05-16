@@ -11,7 +11,14 @@ type AgentGlanceItem = Omit<typeof agentsGlance[0], 'lucideIcon'>;
 const MyWorkforce = () => {
   const navigate = useNavigate();
   const handleCta = (url: string | undefined) => {
-    if (url) window.location.href = url; // Consider using navigate(url) for internal links if preferred
+    if (!url) return; // Add a check for undefined url
+    // Check if the URL is an external link (starts with http or https)
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      window.open(url, '_blank');
+    } else {
+      // For internal links, use react-router-dom's navigate
+      navigate(url);
+    }
   };
   return (
     <div className="space-y-8">
@@ -24,7 +31,7 @@ const MyWorkforce = () => {
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-lg overflow-hidden">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-lg overflow-hidden">
                         <img src={agent.agentLogo} alt={agent.name} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="font-medium text-base">{agent.name}</h3>
