@@ -95,11 +95,12 @@ const connections = [
 
 const AccountSettings = () => {
   const [competitors, setCompetitors] = useState<string[]>([
-    "Microsoft",
-    "Apple",
-    "Amazon",
-    "Meta",
-    "OpenAI"
+    "Box",
+    "Zapier",
+    "Pipefy",
+    "Woli",
+    "RoosterMoney",
+    "SmartSites"
   ]);
   const [competitorInput, setCompetitorInput] = useState("");
   const navigate = useNavigate();
@@ -107,8 +108,8 @@ const AccountSettings = () => {
   const brandForm = useForm<BrandFormValues>({
     resolver: zodResolver(brandFormSchema),
     defaultValues: {
-      company: "Google",
-      brandDescription: "Google's mission is to organize the world's information and make it universally accessible and useful. Since our founding in 1998, Google has grown by leaps and bounds. From offering search in a single language we now offer dozens of products and services—including various forms of advertising and web applications for all kinds of tasks—in scores of languages.",
+      company: "Strivelabs",
+      brandDescription: `Strivelabs.ai is a company focused on leveraging artificial intelligence to enhance operational productivity and automate critical workflows for product organizations. They offer an intelligent assistant platform that integrates support and product teams, streamlining collaboration between customer success and product development. Their AI-powered solutions aim to automate recurring and time-consuming aspects of workflows, allowing teams to focus on higher-value tasks. Strivelabs also provides integration services, particularly for enterprise SaaS platforms, with a focus on keeping various tools in sync. Their product offerings include AI agents designed to work alongside human teams in a "human-in-the-loop" setup, blending AI efficiency with human insight. The company's core mission is to redefine how humans and AI work together, creating a WorkOS platform where business workflows converge and thrive.`,
       geographiesServed: ["USA", "Canada", "India"],
       competitors: "",
     },

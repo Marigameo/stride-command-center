@@ -2,180 +2,215 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
+  Area,
+  AreaChart,
+  BarChart,
+  Bar,
+  ReferenceLine,
 } from "recharts";
-import { AlertTriangle, TrendingUp, Clock, Brain } from "lucide-react";
-import { attentionItems, performanceMetrics, agentsGlance, tasks } from "@/data/mockData";
+import { TrendingUp, ChevronUp, ChevronDown, BarChart3 } from "lucide-react";
+import { performanceMetrics } from "@/data/mockData";
+import MiniTrendChart from './MiniTrendChart';
+import { cn } from '@/lib/utils';
 
-// Process performance trend data
+// Process performance trend data for interactive chart
 const getPerformanceTrendData = () => {
-  const last7Days = [...Array(7)].map((_, i) => {
+  const last30Days = [...Array(30)].map((_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - i);
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }).reverse();
 
-  return last7Days.map((day, index) => ({
-    name: day,
-    completionRate: 75 + Math.random() * 20,
-    efficiency: 80 + Math.random() * 15,
-  }));
+  return last30Days.map((day, index) => {
+    const randomFactor = Math.sin(index / 5) * 0.2 + 0.9;
+    const costSaved = 200 + Math.round(Math.random() * 100 * randomFactor);
+    const taskCompletion = 75 + Math.round(Math.random() * 20 * randomFactor);
+    const acceptanceRate = 90 + Math.round(Math.random() * 10 * randomFactor);
+    const conversionRate = 2 + Math.random() * 1.5 * randomFactor;
+    
+    return {
+      name: day,
+      costSaved,
+      taskCompletion,
+      acceptanceRate,
+      conversionRate: conversionRate.toFixed(1),
+    };
+  });
 };
 
 const performanceTrendData = getPerformanceTrendData();
 
-// Calculate aggregate metrics
-const calculateMetrics = () => {
-  const totalTasks = tasks.length;
-  const criticalTasks = tasks.filter(task => task.impact === "Critical").length;
-  const activeAgents = agentsGlance.filter(agent => agent.status === "Active").length;
-  const totalAgents = agentsGlance.length;
+// Define Agent Insights data with enhanced styling
+const agentInsights = [
+  {
+    id: 1,
+    insight: "Impressions are up 10% this week",
+    agent: "Keyword Optimizer",
+    trend: "up",
+    change: "+10%",
+    bgColor: "bg-green-50",
+    borderColor: "border-green-200",
+    iconColor: "text-green-500",
+    icon: ChevronUp
+  },
+  {
+    id: 2,
+    insight: "Approval Rate is up 1.5% this week",
+    agent: "Books Reconciler",
+    trend: "up",
+    change: "+1.5%",
+    bgColor: "bg-blue-50",
+    borderColor: "border-blue-200",
+    iconColor: "text-blue-500",
+    icon: ChevronUp
+  },
+  {
+    id: 3,
+    insight: "100% Approval Rate for Product Campaigns",
+    agent: "Keyword Optimizer",
+    trend: "up",
+    change: "+100%",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-200",
+    iconColor: "text-purple-500",
+    icon: ChevronUp
+  },
+  {
+    id: 4,
+    insight: "CTR down 5% for Competitor Campaigns over the last 4 weeks",
+    agent: "Keyword Optimizer",
+    trend: "down",
+    change: "-5%",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-200",
+    iconColor: "text-red-500",
+    icon: ChevronDown
+  }
+];
 
-  return {
-    activeAgents,
-    totalAgents,
-    activePercentage: (activeAgents / totalAgents) * 100,
-    criticalTasks,
-    totalTasks,
-  };
+// Enhanced performance metrics with conversion rate
+const enhancedPerformanceMetrics = [
+  ...performanceMetrics,
+  {
+    id: 4,
+    metric: "Conversion Rate",
+    trend: "down",
+    value: "-9%",
+    change: "-34%",
+    timeline: "This Week"
+  }
+];
+
+// Custom tooltip for the interactive chart
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-4 border rounded-md shadow-md">
+        <p className="font-medium text-gray-800">{label}</p>
+        <div className="mt-2 space-y-1">
+          {payload.map((entry, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }}></div>
+              <span className="text-sm text-gray-700">{entry.name}: </span>
+              <span className="text-sm font-medium">
+                {entry.name === "Cost Saved" ? `$${entry.value}` : 
+                 entry.name === "Conversion Rate" ? `${entry.value}%` : 
+                 `${entry.value}%`}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 const Insights = () => {
-  const metrics = calculateMetrics();
-
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-6">Workforce Insights</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Current Workforce Status */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-semibold">Current Workforce Status</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <div className="text-sm text-gray-600">Active Agents</div>
-                  <div className="text-2xl font-semibold text-orange-600">{metrics.activeAgents}/{metrics.totalAgents}</div>
-                  <div className="text-sm text-gray-500">{Math.round(metrics.activePercentage)}% Utilization</div>
+      
+      {/* Performance Summary Section */}
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Performance Summary (For the quarter)</h2>
+        </div>
+        
+        {/* Performance Metrics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {enhancedPerformanceMetrics.map((metric) => (
+            <Card key={metric.id} className={metric.metric === "Conversion Rate" ? "border-red-300" : ""}>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-medium text-gray-700 text-sm">{metric.metric}</h3>
                 </div>
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="text-sm text-gray-600">Tasks in Progress</div>
-                  <div className="text-2xl font-semibold text-blue-600">{metrics.totalTasks}</div>
-                  <div className="text-sm text-gray-500">{metrics.criticalTasks} Critical</div>
+                <div className="flex items-end gap-2 mb-2">
+                  <span className={`text-2xl font-semibold ${metric.metric === "Conversion Rate" ? "text-red-600" : ""}`}>
+                    {metric.value}
+                  </span>
+                  <span className={cn("text-xs font-medium pb-0.5", 
+                    metric.trend === "up" ? "text-green-600" : 
+                    metric.trend === "down" ? "text-red-600" : 
+                    "text-gray-600"
+                  )}>
+                    {metric.change} (WoW)
+                  </span>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">Current Activities</h3>
-                <div className="space-y-2">
-                  {agentsGlance.map((agent, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">{agent.name}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${
-                        agent.status === "Active" ? "bg-green-100 text-green-800" :
-                        agent.status === "Waiting" ? "bg-orange-100 text-orange-800" :
-                        "bg-blue-100 text-blue-800"
-                      }`}>
-                        {agent.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                <MiniTrendChart 
+                  trend={metric.trend as 'up' | 'down' | 'stable'} 
+                  change={metric.change} 
+                />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
 
-        {/* Performance Trends */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-semibold">7-Day Performance Trends</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={performanceTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="completionRate" name="Completion Rate" stroke="#ea580c" strokeWidth={2} />
-                <Line type="monotone" dataKey="efficiency" name="Efficiency" stroke="#3b82f6" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Immediate Attention Required */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-semibold">Needs Your Attention</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {attentionItems.map((item, index) => (
-                <div key={index} className="flex items-start space-x-4 p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1">
-                    <div className={`text-sm font-medium ${item.actionTypeColor}`}>{item.actionType}</div>
-                    <div className="text-sm text-gray-600">{item.agentName}</div>
-                    <div className={`text-xs ${item.descriptionColor}`}>{item.description}</div>
-                  </div>
-                  <div className="text-xs font-medium text-gray-500">
-                    Impact: {item.impact}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Optimization Opportunities */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-semibold">Optimization Opportunities</CardTitle>
-            <Brain className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {performanceMetrics.map((metric, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="text-sm font-medium">{metric.metric}</div>
-                    <div className="text-xs text-gray-500">{metric.timeline}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold">{metric.value}</div>
-                    <div className={`text-xs ${
-                      metric.trend === 'up' ? 'text-green-600' : 
-                      metric.trend === 'down' ? 'text-red-600' : 
-                      'text-gray-600'
-                    }`}>
-                      {metric.change}
+      {/* Agent Insights Section - Enhanced with better styling */}
+      <section className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Agent Insights</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {agentInsights.map((insight) => {
+            const Icon = insight.icon;
+            return (
+              <Card 
+                key={insight.id} 
+                className={cn("border-l-4 transition-all hover:shadow-md", insight.borderColor)}
+              >
+                <CardContent className="pt-6">
+                  <div className={cn("flex items-center justify-between p-4 rounded-lg", insight.bgColor)}>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className={cn("p-1 rounded-full", insight.iconColor, "bg-white")}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="text-sm font-medium">{insight.insight}</div>
+                      </div>
+                      <div className="ml-6 mt-2">
+                        <div className="text-base font-semibold text-gray-800">{insight.agent}</div>
+                        <div className={cn("text-sm font-medium mt-1", 
+                          insight.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                        )}>
+                          {insight.change}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              <div className="mt-4">
-                <h3 className="text-sm font-medium mb-2">Recommendations</h3>
-                <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
-                  <li>Redistribute tasks from high-utilization agents to optimize workload</li>
-                  <li>Review and update automation rules for repetitive tasks</li>
-                  <li>Consider scaling up agent capacity based on current utilization</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 };
