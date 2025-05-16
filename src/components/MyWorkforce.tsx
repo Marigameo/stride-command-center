@@ -2,26 +2,16 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { agentsGlance } from "@/data/mockData";
-import { FileSearch2, Filter, BookOpenText, LucideProps } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
-// Helper for Lucide icon
-const getLucideIcon = (iconName: string) => {
-  switch (iconName) {
-    case 'FileSearch2': return FileSearch2;
-    case 'Funnel': return Filter;
-    case 'BookOpenText': return BookOpenText;
-    default: return null;
-  }
-};
-
-type AgentGlanceItem = typeof agentsGlance[0];
+// Updated type to reflect changes in mockData (no lucideIcon)
+type AgentGlanceItem = Omit<typeof agentsGlance[0], 'lucideIcon'>;
 
 const MyWorkforce = () => {
   const navigate = useNavigate();
   const handleCta = (url: string | undefined) => {
-    if (url) window.location.href = url;
+    if (url) window.location.href = url; // Consider using navigate(url) for internal links if preferred
   };
   return (
     <div className="space-y-8">
@@ -29,14 +19,13 @@ const MyWorkforce = () => {
         <h2 className="text-xl font-semibold mb-4">My Workforce</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {agentsGlance.map((agent: AgentGlanceItem) => {
-            const IconComponent = agent.lucideIcon ? getLucideIcon(agent.lucideIcon) : null;
             return (
               <Card key={agent.id}>
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-lg">
-                        {IconComponent ? <IconComponent size={24} className="text-gray-600"/> : agent.agentLogo}
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-lg overflow-hidden">
+                        <img src={agent.agentLogo} alt={agent.name} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="font-medium text-base">{agent.name}</h3>
                     </div>

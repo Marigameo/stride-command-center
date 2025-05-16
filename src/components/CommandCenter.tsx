@@ -9,7 +9,7 @@ import {
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ArrowDown, ArrowUp, Minus, AlertTriangle, LucideProps, FileSearch2, Filter, BookOpenText, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { attentionItems, performanceMetrics, agentsGlance } from "@/data/mockData";
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -27,20 +27,9 @@ const samplePerformanceMetric = {
     timeline: ""
 };
 type PerformanceMetricItem = typeof samplePerformanceMetric;
-type AttentionItem = typeof attentionItems[0];
-type AgentGlanceItem = typeof agentsGlance[0];
-
-type LucideIconComponent = React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
-
-const getLucideIcon = (iconName: string): LucideIconComponent | null => {
-  switch (iconName) {
-    case 'FileSearch2': return FileSearch2;
-    case 'Funnel': return Filter;
-    case 'BookOpenText': return BookOpenText;
-    case 'AlertTriangle': return AlertTriangle;
-    default: return null;
-  }
-};
+// Updated types to reflect changes in mockData (no lucideIcon)
+type AttentionItem = Omit<typeof attentionItems[0], 'lucideIcon'>;
+type AgentGlanceItem = Omit<typeof agentsGlance[0], 'lucideIcon'>;
 
 const CommandCenter = () => {
   const [hiddenItems, setHiddenItems] = useState<number[]>([]);
@@ -85,7 +74,6 @@ const CommandCenter = () => {
             <Carousel opts={{ align: "start" }} className="w-full">
               <CarouselContent className="-ml-4">
                 {visibleAttentionItems.map((item: AttentionItem) => {
-                  const IconComponent = item.lucideIcon ? getLucideIcon(item.lucideIcon) : null;
                   return (
                     <CarouselItem 
                       key={item.id} 
@@ -106,8 +94,8 @@ const CommandCenter = () => {
                         </CardHeader>
                         <CardContent className="flex-grow">
                           <div className="flex items-center gap-3 my-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg">
-                              {IconComponent ? <IconComponent size={24} /> : item.agentLogo}
+                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg overflow-hidden">
+                              <img src={item.agentLogo} alt={item.agentName} className="w-full h-full object-cover" />
                             </div>
                             <div className="font-medium text-base">{item.agentName}</div>
                           </div>
@@ -139,7 +127,7 @@ const CommandCenter = () => {
 
       <section className="px-4 py-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Performance Summary</h2>
+          <h2 className="text-xl font-semibold">Performance Summary (For the quarter)</h2>
           <Button
             variant="ghost"
             size="sm"
@@ -160,7 +148,7 @@ const CommandCenter = () => {
                 <div className="flex items-end gap-2 mb-2">
                   <span className="text-2xl font-semibold">{metric.value}</span>
                   <span className={cn("text-xs font-medium pb-0.5", metric.trend === "up" ? "text-green-600" : metric.trend === "down" ? "text-red-600" : "text-gray-600")}>
-                    {metric.change}
+                    {metric.change} (WoW)
                   </span>
                 </div>
                 <MiniTrendChart trend={metric.trend as "up" | "down" | "stable"} change={metric.change} />
@@ -184,15 +172,18 @@ const CommandCenter = () => {
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {agentsGlance.map((agent: AgentGlanceItem) => {
-            const IconComponent = agent.lucideIcon ? getLucideIcon(agent.lucideIcon) : null;
+          {agentsGlance
+            .filter(agent => agent.id === 1 || agent.id === 2 || agent.id === 4) // Display KO, CFO, and BCS
+            .map((agent: AgentGlanceItem) => {
+            const attentionItem = attentionItems.find(item => item.id === agent.id);
+            const metricColor = attentionItem ? attentionItem.descriptionColor : 'text-gray-500';
             return (
               <Card key={agent.id}>
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-lg">
-                        {IconComponent ? <IconComponent size={24} className="text-gray-600"/> : agent.agentLogo}
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-lg overflow-hidden">
+                        <img src={agent.agentLogo} alt={agent.name} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="font-medium text-base">{agent.name}</h3>
                     </div>
@@ -213,8 +204,8 @@ const CommandCenter = () => {
                       'No current task'
                     )}
                   </p>
-                  <p className="text-xs text-gray-500 mb-6 truncate" title={agent.metric}>
-                    <span className="font-semibold">Metric:</span> {agent.metric}
+                  <p className={cn("text-xs text-gray-500 mb-6 truncate", metricColor)} title={agent.metric}>
+                    <span className="font-semibold"></span> {agent.metric}
                   </p>
                   
                   <div className="mb-3">

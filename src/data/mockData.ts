@@ -3,8 +3,7 @@ export const attentionItems = [
     id: 1,
     actionType: "Approval Required",
     agentName: "Keyword Optimizer",
-    agentLogo: "K",
-    lucideIcon: "FileSearch2",
+    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png",
     impact: "High",
     primaryCta: "Review",
     secondaryCta: "Defer",
@@ -19,8 +18,7 @@ export const attentionItems = [
     id: 2,
     actionType: "Anomaly Detected",
     agentName: "Conversion Funnel Optimizer",
-    agentLogo: "C",
-    lucideIcon: "Funnel",
+    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_1.png",
     impact: "Critical",
     primaryCta: "View Anomaly",
     secondaryCta: "Diagnose",
@@ -35,8 +33,7 @@ export const attentionItems = [
     id: 3,
     actionType: "Unblocking Required",
     agentName: "Books Reconciler",
-    agentLogo: "B",
-    lucideIcon: "BookOpenText",
+    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_16.png",
     impact: "Critical",
     primaryCta: "View Error",
     secondaryCta: "Reauth",
@@ -69,10 +66,10 @@ export const performanceMetrics = [
   },
   {
     id: 6,
-    metric: "Active Agents",
+    metric: "Acceptance Rate",
     trend: "up",
-    value: "18",
-    change: "+2",
+    value: "95%",
+    change: "+2%",
     timeline: "This Month"
   }
 ];
@@ -81,12 +78,11 @@ export const agentsGlance = [
   {
     id: 1,
     name: "Keyword Optimizer",
-    agentLogo: "K",
-    lucideIcon: "FileSearch2",
+    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png",
     status: "Waiting",
     currentTask: "Optimizing Holiday Campaign",
     progress: 65,
-    metric: "Est. +$780 potential savings",
+    metric: "+$524 in savings",
     cta: "Review",
     ctaAction: "navigateToAgent",
     agentPageUrl: "/agents/keyword-optimizer"
@@ -94,12 +90,11 @@ export const agentsGlance = [
   {
     id: 2,
     name: "Conversion Funnel Optimizer",
-    agentLogo: "C",
-    lucideIcon: "Funnel",
+    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_1.png",
     status: "Idle",
     lastCompleted: "A/B Test Concluded",
     progress: 100,
-    metric: "Ready for new task",
+    metric: "-34% Leads WoW",
     cta: "Review",
     ctaAction: "navigateToAgent",
     agentPageUrl: "/agents/conversion-funnel-optimizer"
@@ -107,15 +102,26 @@ export const agentsGlance = [
   {
     id: 3,
     name: "Books Reconciler",
-    agentLogo: "B",
-    lucideIcon: "BookOpenText",
+    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_16.png",
     status: "Active",
     currentTask: "Reconciling Q3 Expenses",
     progress: 30,
-    metric: "12 Overdue Reconciliations",
+    metric: "27 Expenses Pending",
     cta: "Review",
     ctaAction: "navigateToAgent",
     agentPageUrl: "/agents/books-reconciler"
+  },
+  {
+    id: 4,
+    name: "Blog Content Strategizer",
+    agentLogo: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_22.png",
+    status: "Active",
+    currentTask: "Creating outline for Amazon Marketplace",
+    progress: 33,
+    metric: "5 blog posts to be picked",
+    cta: "View Outline",
+    ctaAction: "navigateToAgent",
+    agentPageUrl: "/agents/blog-strategizer"
   }
 ];
 
