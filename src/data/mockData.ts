@@ -44,6 +44,21 @@ export const attentionItems = [
     secondaryCtaAction: "navigateToReauth",
     agentPageUrl: "/agents/books-reconciler",
     reauthPageUrl: "/reauth/books-reconciler"
+  },
+  {
+    id: 4,
+    actionType: "In Progress",
+    agentName: "Blog Content Strategizer",
+    agentLogo: "/avatars/avatar4.png",
+    impact: "Medium",
+    primaryCta: "View Progress",
+    secondaryCta: "Pause",
+    description: "Outline 65% Complete",
+    actionTypeColor: "text-blue-600",
+    descriptionColor: "text-orange-500",
+    primaryCtaAction: "navigateToAgent",
+    secondaryCtaAction: "hideCard",
+    agentPageUrl: "/agents/blog-content-strategizer"
   }
 ];
 
@@ -117,11 +132,11 @@ export const agentsGlance = [
     agentLogo: "/avatars/avatar4.png",
     status: "Active",
     currentTask: "Creating outline for Amazon Marketplace",
-    progress: 33,
+    progress: 65,
     metric: "5 blog posts to be picked",
     cta: "View Outline",
     ctaAction: "navigateToAgent",
-    agentPageUrl: "/agents/books-reconciler"
+    agentPageUrl: "/agents/blog-content-strategizer"
   }
 ];
 

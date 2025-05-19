@@ -13,6 +13,8 @@ import MyWorkforce from "@/components/MyWorkforce";
 import AccountSettings from "@/components/AccountSettings";
 import Layout from "@/components/Layout";
 import BooksReconcilerReview from "@/pages/agents/BooksReconcilerReview";
+import BlogContentStrategizer from "@/pages/agents/BlogContentStrategizer";
+import BlogContentStrategizerSettings from "@/pages/agents/BlogContentStrategizerSettings";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -61,6 +63,8 @@ const App = () => (
             <Route path="/agents/keyword-optimizer" element={<ExternalRedirect to={AGENT_URLS.keywordOptimizer} />} />
             <Route path="/agents/conversion-funnel-optimizer" element={<ExternalRedirect to={AGENT_URLS.conversionFunnel} />} />
             <Route path="/agents/books-reconciler" element={<BooksReconcilerReview />} />
+            <Route path="/agents/blog-content-strategizer" element={<BlogContentStrategizer />} />
+            <Route path="/agents/blog-content-strategizer/settings" element={<BlogContentStrategizerSettings />} />
 
             {/* Reauth page inside layout */}
             <Route path="/reauth/:service" element={<ReauthPage />} />
