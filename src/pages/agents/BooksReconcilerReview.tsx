@@ -2,32 +2,32 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Check, X, Upload } from "lucide-react";
+import { Check, X, Upload, Maximize2, Minimize2 } from "lucide-react";
 
 // Mock data for bills
 const billsData = [
   {
     id: 1,
-    imageUrl: "/bills/GST-Bill-Format-47.webp",
-    amount: 524.99,
-    vendor: "Office Supplies Co",
-    date: "2024-03-15",
+    imageUrl: "/bills/bill-1.jpg",
+    amount: 398.00,
+    vendor: "Gujarat Freight Tools",
+    date: "2024-03-20",
     status: "pending"
   },
   {
     id: 2,
-    imageUrl: "/bills/1.webp",
-    amount: 1299.99,
-    vendor: "Tech Equipment Ltd",
-    date: "2024-03-14",
+    imageUrl: "/bills/bill-2.png",
+    amount: 968.00,
+    vendor: "Sleek Bill - Nirmal Vijay",
+    date: "2025-01-23",
     status: "pending"
   },
   {
     id: 3,
-    imageUrl: "/bills/Tax-Invoice-272.jpg",
-    amount: 749.50,
-    vendor: "Marketing Services Inc",
-    date: "2024-03-13",
+    imageUrl: "/bills/bill-3.webp",
+    amount: 2563.00,
+    vendor: "Hindustan Uniliver",
+    date: "2023-07-15",
     status: "pending"
   }
 ];
@@ -36,6 +36,7 @@ const BooksReconcilerReview = () => {
   const [bills, setBills] = useState(billsData);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const handleApprove = (billId: number) => {
     setBills(bills.map(bill => 
@@ -95,38 +96,50 @@ const BooksReconcilerReview = () => {
 
       {/* Bill Review Carousel */}
       {pendingBills.length > 0 ? (
-        <Card className="p-6">
-          <div className="text-center mb-6">
-            <h2 className="text-lg font-medium">Review Bills</h2>
-            <p className="text-sm text-gray-500">
-              {currentIndex + 1} of {pendingBills.length} pending bills
-            </p>
+        <Card className={`p-6 transition-all duration-300 Rs.{isFullScreen ? 'fixed inset-4 z-50 bg-background' : ''}`}>
+          <div className="flex justify-between items-center mb-6">
+            <div className="text-center flex-1">
+              <h2 className="text-lg font-medium">Review Bills</h2>
+              <p className="text-sm text-gray-500">
+                {currentIndex + 1} of {pendingBills.length} pending bills
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsFullScreen(!isFullScreen)}
+              className="ml-4"
+            >
+              {isFullScreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
+            </Button>
           </div>
           
           <Carousel
-            className="w-full max-w-xl mx-auto"
+            className={`w-full mx-auto Rs.{isFullScreen ? 'max-w-6xl' : 'max-w-4xl'}`}
           >
             <CarouselContent>
               {pendingBills.map((bill) => (
                 <CarouselItem key={bill.id}>
                   <div className="space-y-6">
-                    <img 
-                      src={bill.imageUrl} 
-                      alt={`Bill from ${bill.vendor}`}
-                      className="w-full h-[500px] object-cover rounded-lg border"
-                    />
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Vendor:</span>
-                        <span className="font-medium">{bill.vendor}</span>
+                    <div className="relative aspect-[3/4] w-full max-h-[80vh]">
+                      <img 
+                        src={bill.imageUrl} 
+                        alt={`Bill from Rs.{bill.vendor}`}
+                        className="w-full h-full object-contain rounded-lg border bg-gray-50"
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="space-y-1">
+                        <span className="text-sm text-gray-500">Vendor</span>
+                        <p className="font-medium">{bill.vendor}</p>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Amount:</span>
-                        <span className="font-medium">${bill.amount.toFixed(2)}</span>
+                      <div className="space-y-1">
+                        <span className="text-sm text-gray-500">Amount</span>
+                        <p className="font-medium">Rs.{bill.amount.toFixed(2)}</p>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Date:</span>
-                        <span className="font-medium">{bill.date}</span>
+                      <div className="space-y-1">
+                        <span className="text-sm text-gray-500">Date</span>
+                        <p className="font-medium">{bill.date}</p>
                       </div>
                     </div>
                     <div className="flex gap-4">
@@ -152,8 +165,8 @@ const BooksReconcilerReview = () => {
             </CarouselContent>
             {pendingBills.length > 1 && (
               <>
-                <CarouselPrevious />
-                <CarouselNext />
+                <CarouselPrevious className={isFullScreen ? 'left-4' : ''} />
+                <CarouselNext className={isFullScreen ? 'right-4' : ''} />
               </>
             )}
           </Carousel>
@@ -176,7 +189,7 @@ const BooksReconcilerReview = () => {
             disabled={uploading}
           >
             <Upload className="w-4 h-4" />
-            {uploading ? "Uploading to Zoho..." : `Upload ${approvedBills.length} Bills to Zoho`}
+            {uploading ? "Uploading to Zoho..." : `Upload Rs.{approvedBills.length} Bills to Zoho`}
           </Button>
         </div>
       )}
