@@ -15,7 +15,8 @@ import {
   BarChart3, 
   LayoutDashboard, 
   FileSearch,
-  ArrowRight
+  ArrowRight,
+  Pause
 } from "lucide-react";
 import ReactFlow, { 
   Background, 
@@ -186,7 +187,10 @@ const BlogContentStrategizer = () => {
       {/* Headline Section */}
       <section className="px-4">
         <div className="mb-4">
-          <h1 className="text-2xl font-semibold">Blog Content Strategizer</h1>
+          <div className="flex items-center gap-3">
+            <img src="/avatars/avatar4.png" alt="Blog Content Strategizer" className="w-8 h-8 rounded-full" />
+            <h1 className="text-2xl font-semibold">Blog Content Strategizer</h1>
+          </div>
           <p className="text-gray-600 mt-2">
             Researches your competitors' blog posts for a set of keywords to recommend a post outline and strategy to outrank their articles
           </p>
@@ -223,7 +227,7 @@ const BlogContentStrategizer = () => {
             <AccordionItem value="workflow" className="border-b-0">
               <div className="flex items-center justify-between p-2">
                 <AccordionTrigger className="py-2 hover:no-underline flex-grow">
-                  <span className="text-base font-medium">View Workflow Diagram</span>
+                  <span className="ml-4 text-base font-medium">Workflow Stages</span>
                 </AccordionTrigger>
                 <Button 
                   variant="ghost" 
@@ -484,7 +488,7 @@ const BlogContentStrategizer = () => {
           
           <div className="relative group">
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full w-10 h-10">
-              <Play className="h-5 w-5" />
+              <Pause className="h-5 w-5" />
               <span className="sr-only">Pause</span>
             </Button>
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">

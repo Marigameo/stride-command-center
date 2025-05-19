@@ -134,7 +134,7 @@ export const agentsGlance = [
     currentTask: "Creating outline for Amazon Marketplace",
     progress: 65,
     metric: "5 blog posts to be picked",
-    cta: "View Outline",
+    cta: "Review",
     ctaAction: "navigateToAgent",
     agentPageUrl: "/agents/blog-content-strategizer"
   }
