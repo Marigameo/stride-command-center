@@ -40,7 +40,13 @@ const CommandCenter = () => {
     if (!action) return;
     switch (action) {
       case 'navigateToAgent':
-        if (url) navigate(url);
+        if (url) {
+          if (url.startsWith('http')) {
+            window.open(url, '_blank');
+          } else {
+            navigate(url);
+          }
+        }
         break;
       case 'hideCard':
         if (itemId !== undefined) setHiddenItems(prev => [...prev, itemId]);

@@ -32,6 +32,7 @@ import ReactFlow, {
   Handle
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { VerticalMarquee } from "@/components/magicui/vertical-marquee";
 
 // Shimmer effect component
 const Shimmer = () => (
@@ -176,7 +177,9 @@ const BlogContentStrategizer = () => {
     'Parse Competitor Blog Posts',
     'Extract Properties & Keywords from Posts',
     'Synthesize across Competing Posts',
-    'Recommend Blog Outline'
+    'Recommend Blog Outline',
+    'Tune Sections to Brand Guidelines',
+    'Publish as Content Strategy'
   ];
 
   // Current active step (0-based index)
@@ -277,95 +280,76 @@ const BlogContentStrategizer = () => {
 
       {/* Center Stage - Sequential Steps */}
       <section className="px-4 py-8">
-        <div className="relative min-h-[500px] flex items-center justify-center overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl border border-gray-700">
-          <div className="w-full max-w-4xl px-8">
-            <div className="relative h-[400px] overflow-hidden">
-              {/* Animated background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent animate-pulse" />
-              
-              {workflowSteps.map((step, index) => {
-                // Calculate width based on position relative to active step
-                const getWidth = () => {
-                  if (index === activeStepIndex) return '100%';
-                  if (index < activeStepIndex) {
-                    const distance = activeStepIndex - index;
-                    return `${Math.max(40, 100 - (distance * 15))}%`;
-                  } else {
-                    const distance = index - activeStepIndex;
-                    return `${Math.max(40, 100 - (distance * 15))}%`;
-                  }
-                };
-
-                // Calculate animation delay for sequential reveal
-                const getAnimationDelay = () => {
-                  if (index > activeStepIndex) return '0s';
-                  return `${index * 0.5}s`;
-                };
-
-                return (
+        <Card>
+          <CardContent className="p-0">
+            <div className="h-[600px] relative flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 pointer-events-none" />
+              <VerticalMarquee 
+                speed={50} 
+                className="h-full" 
+                activeIndex={activeStepIndex}
+              >
+                {workflowSteps.map((step, index) => (
                   <div
                     key={index}
-                    className={`absolute left-1/2 -translate-x-1/2 transition-all duration-700 ease-in-out ${
-                      index === activeStepIndex
-                        ? 'scale-100 opacity-100'
-                        : index < activeStepIndex
-                        ? 'scale-75 opacity-40'
-                        : 'scale-90 opacity-0'
-                    } animate-sequential-reveal`}
-                    style={{
-                      width: getWidth(),
-                      animationDelay: getAnimationDelay(),
-                      top: `${index * 100}px`
-                    }}
+                    className={`flex items-center gap-4 p-6 rounded-lg border ${
+                      index > activeStepIndex 
+                        ? 'border-gray-100/20 bg-gray-50/50' 
+                        : 'border-gray-200/20 bg-card'
+                    } text-card-foreground shadow-sm mb-8`}
                   >
-                    <div className={`p-6 rounded-lg ${
-                      index === activeStepIndex
-                        ? 'bg-blue-900/30 shadow-lg shadow-blue-500/20'
-                        : 'bg-gray-800/50'
-                    }`}>
-                      <div className="flex items-center gap-4">
-                        {/* Step number/status */}
-                        <div className={`flex items-center justify-between py-3 px-4 rounded-lg backdrop-blur-sm relative ${index === activeStepIndex ? 'processing-step' : ''}`}>
-                          <div className="flex items-center space-x-4">
-                            <div className="flex-shrink-0">
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center ${index < activeStepIndex ? 'bg-green-100/10' : 'bg-blue-100/10'}`}>
-                                {index < activeStepIndex ? (
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-green-500 animate-pulse-glow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                ) : (
-                                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex-grow text-center">
-                              <h3 className={`${index === activeStepIndex ? 'text-white font-semibold text-lg text-glow animate-pulse-glow tracking-wide' : 'text-gray-200 text-sm font-medium'}`}>
-                                {step}
-                                {index === activeStepIndex && (
-                                  <span className="ml-3 inline-flex">
-                                    <span className="processing-dot">.</span>
-                                    <span className="processing-dot">.</span>
-                                    <span className="processing-dot">.</span>
-                                  </span>
-                                )}
-                              </h3>
-                            </div>
-                            {/* Status indicator */}
-                            {index < activeStepIndex && (
-                              <div className="flex-shrink-0">
-                                <span className="text-sm text-green-300 text-glow animate-pulse-glow font-semibold tracking-wide">Completed</span>
-                              </div>
-                            )}
-                          </div>
+                    <div className="flex items-center space-x-4 w-full">
+                      <div className="flex-shrink-0">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                          index < activeStepIndex 
+                            ? 'bg-green-100' 
+                            : index === activeStepIndex 
+                              ? 'bg-blue-100'
+                              : 'bg-gray-100'
+                        }`}>
+                          {index < activeStepIndex ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <div className={`w-2 h-2 rounded-full ${
+                              index === activeStepIndex 
+                                ? 'bg-blue-500' 
+                                : 'bg-gray-400'
+                            }`} />
+                          )}
                         </div>
                       </div>
+                      <div className="flex-grow">
+                        <h3 className={`text-lg ${
+                          index === activeStepIndex 
+                            ? 'font-semibold text-primary' 
+                            : index > activeStepIndex
+                              ? 'font-medium text-gray-500'
+                              : 'font-medium'
+                        }`}>
+                          {step}
+                          {index === activeStepIndex && (
+                            <span className="ml-2 text-sm text-muted-foreground">(In Progress)</span>
+                          )}
+                        </h3>
+                      </div>
+                      {index < activeStepIndex ? (
+                        <div className="flex-shrink-0">
+                          <span className="text-sm text-green-500 font-medium">Completed</span>
+                        </div>
+                      ) : index > activeStepIndex && (
+                        <div className="flex-shrink-0">
+                          <span className="text-sm text-gray-400 font-medium">Pending</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                );
-              })}
+                ))}
+              </VerticalMarquee>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </section>
 
       <style>{`
