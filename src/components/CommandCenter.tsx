@@ -1,40 +1,35 @@
-import React, { useState } from 'react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { ArrowRight } from "lucide-react";
-import { attentionItems, performanceMetrics, agentsGlance } from "@/data/mockData";
+import { attentionItems } from "@/data/mockData";
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import MiniTrendChart from './MiniTrendChart';
-import { useAppStore } from '@/store/appStore';
+import { useState } from 'react';
 
-// Local type definitions based on mockData structure
-// Ensuring trend is correctly typed for PerformanceMetricItem
-const samplePerformanceMetric = {
-    id: 0,
-    metric: "",
-    trend: "stable" as "up" | "down" | "stable", // Explicitly type trend here
-    value: "",
-    change: "",
-    timeline: ""
+type AttentionItem = {
+  id: number;
+  actionType: string;
+  agentName: string;
+  agentLogo: string;
+  impact: string;
+  primaryCta: string;
+  secondaryCta: string;
+  description: string;
+  actionTypeColor: string;
+  descriptionColor: string;
+  agentPageUrl: string;
+  primaryCtaAction: string;
+  secondaryCtaAction: string;
+  category: string;
+  showInCommandCenter?: boolean;
 };
-type PerformanceMetricItem = typeof samplePerformanceMetric;
-// Updated types to reflect changes in mockData (no lucideIcon)
-type AttentionItem = Omit<typeof attentionItems[0], 'lucideIcon'>;
-type AgentGlanceItem = Omit<typeof agentsGlance[0], 'lucideIcon'>;
+
+const categories = ["All", "Marketing", "Financial Operations", "Sales"];
 
 const CommandCenter = () => {
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [hiddenItems, setHiddenItems] = useState<number[]>([]);
   const navigate = useNavigate();
-  const setCurrentPage = useAppStore((state) => state.setCurrentPage);
 
   const handleCta = (action: string | undefined, url: string | undefined, itemId?: number) => {
     if (!action) return;
@@ -58,14 +53,69 @@ const CommandCenter = () => {
     }
   };
 
-  const visibleAttentionItems = attentionItems.filter(item => !hiddenItems.includes(item.id));
+  const filteredItems = attentionItems.filter(item => 
+    !hiddenItems.includes(item.id) &&
+    (item.showInCommandCenter ?? true) && 
+    (selectedCategory === "All" || item.category === selectedCategory)
+  );
+
+  const renderCategorySection = (category: string) => {
+    const categoryItems = filteredItems.filter(item => item.category === category);
+    if (categoryItems.length === 0) return null;
+
+    return (
+      <div className="my-12 transition-all duration-300 ease-in-out">
+        <h3 className="text-lg font-semibold mb-4">{category}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {categoryItems.map((item: AttentionItem) => (
+            <Card key={item.id} className="flex flex-col h-[250px] transition-all duration-300 ease-in-out hover:shadow-md">
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <div className={cn("text-sm font-medium", item.actionTypeColor)}>{item.actionType}</div>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    item.impact === "High" ? "bg-orange-100 text-orange-600" :
+                    item.impact === "Medium" ? "bg-blue-100 text-blue-800" :
+                    item.impact === "Critical" ? "bg-red-100 text-red-800" :
+                    "bg-gray-100 text-gray-800"
+                  }`}>
+                    {item.impact}
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <div className="flex items-center gap-3 my-3">
+                  <div className="relative w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={item.agentLogo} 
+                      alt={item.agentName} 
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.agentName)}&background=random`;
+                      }}
+                    />
+                  </div>
+                  <div className="font-medium text-base">{item.agentName}</div>
+                </div>
+                <p className={cn("mt-6 font-medium text-sm", item.descriptionColor)}>{item.description}</p>
+              </CardContent>
+              <CardFooter className="flex gap-2 mt-auto border-t pt-4">
+                <Button className="flex-1" onClick={() => handleCta(item.primaryCtaAction, item.agentPageUrl)}>{item.primaryCta}</Button>
+                <Button variant="outline" className="flex-1" onClick={() => handleCta(item.secondaryCtaAction, item.agentPageUrl, item.id)}>{item.secondaryCta}</Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-8 my-6">
-      <section className="overflow-x-hidden px-4 mb-8">
-        <div className="flex justify-between items-center mb-4">
+      <section className="px-4 mb-8">
+        <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Attention Required</h2>
-          <Button
+          <Button 
             variant="ghost"
             size="sm"
             className="text-primary px-0 font-medium group hover:bg-transparent focus:bg-transparent"
@@ -75,159 +125,44 @@ const CommandCenter = () => {
             <ArrowRight className="ml-1.5 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </Button>
         </div>
-        {visibleAttentionItems.length > 0 ? (
-          <div className="relative">
-            <Carousel opts={{ align: "start" }} className="w-full">
-              <CarouselContent className="-ml-4">
-                {visibleAttentionItems.map((item: AttentionItem) => {
-                  return (
-                    <CarouselItem 
-                      key={item.id} 
-                      className={cn(
-                        "pl-4 md:basis-1/2 lg:basis-1/3 transition-all duration-300 ease-out",
-                        hiddenItems.includes(item.id) ? 'opacity-0 max-h-0 scale-y-90 !p-0 !m-0 border-none' : 'opacity-100 max-h-[500px] scale-y-100' 
-                      )}
-                      style={{ transformOrigin: 'top' }}
-                    >
-                      <Card className={cn("flex flex-col h-[250px]", hiddenItems.includes(item.id) && "invisible")} >
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <div className={cn("text-sm font-medium", item.actionTypeColor)}>{item.actionType}</div>
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.impact === "High" ? "bg-orange-100 text-orange-600" : item.impact === "Medium" ? "bg-blue-100 text-blue-800" : item.impact === "Critical" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}`}>
-                              {item.impact}
-                            </span>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="flex-grow">
-                          <div className="flex items-center gap-3 my-3">
-                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg overflow-hidden">
-                              <img src={item.agentLogo} alt={item.agentName} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="font-medium text-base">{item.agentName}</div>
-                          </div>
-                          <p className={cn("mt-6 font-medium text-sm", item.descriptionColor)}>{item.description}</p>
-                        </CardContent>
-                        <CardFooter className="flex gap-2 mt-auto border-t pt-4">
-                          <Button className="flex-1" onClick={() => handleCta(item.primaryCtaAction, item.agentPageUrl)}>{item.primaryCta}</Button>
-                          <Button variant="outline" className="flex-1" onClick={() => handleCta(item.secondaryCtaAction, item.agentPageUrl, item.id)}>{item.secondaryCta}</Button>
-                        </CardFooter>
-                      </Card>
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-              {visibleAttentionItems.length > 1 && (
-                <>
-                  <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300 z-10" />
-                  <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-white border-2 hover:bg-gray-100 hover:border-gray-300 z-10" />
-                </>
-              )}
-            </Carousel>
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No items requiring attention.
-          </div>
-        )}
-      </section>
 
-      <section className="px-4 py-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Performance Summary (For the quarter)</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-primary px-0 font-medium group hover:bg-transparent focus:bg-transparent"
-            onClick={() => navigate('/insights')}
-          >
-            Explore Insights
-            <ArrowRight className="ml-1.5 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {performanceMetrics.map((metric: PerformanceMetricItem) => (
-            <Card key={metric.id}>
-              <CardContent className="pt-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-medium text-gray-700 text-sm">{metric.metric}</h3>
-                </div>
-                <div className="flex items-end gap-2 mb-2">
-                  <span className="text-2xl font-semibold">{metric.value}</span>
-                  <span className={cn("text-xs font-medium pb-0.5", metric.trend === "up" ? "text-green-600" : metric.trend === "down" ? "text-red-600" : "text-gray-600")}>
-                    {metric.change} (WoW)
-                  </span>
-                </div>
-                <MiniTrendChart trend={metric.trend as "up" | "down" | "stable"} change={metric.change} />
-              </CardContent>
-            </Card>
+        <div className="flex flex-wrap gap-3 mb-6">
+          {categories.map((category) => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(category)}
+              className={cn(
+                "min-w-[80px] rounded-full transition-all duration-200 ease-in-out",
+                selectedCategory === category 
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                  : "hover:bg-muted/50"
+              )}
+            >
+              {category}
+            </Button>
           ))}
         </div>
-      </section>
 
-      <section className="px-4 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Agents at-a-glance</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-primary px-0 font-medium group hover:bg-transparent focus:bg-transparent"
-            onClick={() => navigate('/my-workforce')}
-          >
-            View Workforce
-            <ArrowRight className="ml-1.5 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {agentsGlance
-            .filter(agent => agent.id === 1 || agent.id === 2 || agent.id === 4) // Display KO, CFO, and BCS
-            .map((agent: AgentGlanceItem) => {
-            const attentionItem = attentionItems.find(item => item.id === agent.id);
-            const metricColor = attentionItem ? attentionItem.descriptionColor : 'text-gray-500';
-            return (
-              <Card key={agent.id}>
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-lg overflow-hidden">
-                        <img src={agent.agentLogo} alt={agent.name} className="w-full h-full object-cover" />
-                      </div>
-                      <h3 className="font-medium text-base">{agent.name}</h3>
-                    </div>
-                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", agent.status === "Active" ? "bg-green-100 text-green-800" : agent.status === "Idle" ? "bg-blue-100 text-blue-800" : "bg-orange-100 text-orange-800")}>
-                      {agent.status}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3 mt-6 truncate" title={agent.currentTask || (agent.lastCompleted ? `Last: ${agent.lastCompleted}` : '')}>
-                    {agent.currentTask ? (
-                      <>
-                        <span className="font-semibold">Current Task:</span> {agent.currentTask}
-                      </>
-                    ) : agent.lastCompleted ? (
-                      <>
-                        <span className="font-semibold">Last Completed:</span> {agent.lastCompleted}
-                      </>
-                    ) : (
-                      'No current task'
-                    )}
-                  </p>
-                  <p className={cn("text-xs text-gray-500 mb-6 truncate", metricColor)} title={agent.metric}>
-                    <span className="font-semibold"></span> {agent.metric}
-                  </p>
-                  
-                  <div className="mb-3">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>Progress</span>
-                      <span>{agent.progress}%</span>
-                    </div>
-                    <Progress value={agent.progress} className="h-2 [&>div]:bg-orange-500" />
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-end border-t pt-3 pb-3 pr-4">
-                  <Button variant="outline" size="sm" onClick={() => handleCta(agent.ctaAction, agent.agentPageUrl)}>{agent.cta}</Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
+        <div className="transition-all duration-300 ease-in-out">
+          {filteredItems.length > 0 ? (
+            <div className="space-y-8">
+              {selectedCategory === "All" ? (
+                <>
+                  {renderCategorySection("Marketing")}
+                  {renderCategorySection("Financial Operations")}
+                  {renderCategorySection("Sales")}
+                </>
+              ) : (
+                renderCategorySection(selectedCategory)
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500 transition-all duration-300 ease-in-out">
+              No items requiring attention.
+            </div>
+          )}
         </div>
       </section>
     </div>
