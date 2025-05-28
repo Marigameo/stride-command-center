@@ -16,6 +16,7 @@ import BooksReconcilerReview from "@/pages/agents/BooksReconcilerReview";
 import BlogContentStrategizer from "@/pages/agents/BlogContentStrategizer";
 import BlogContentStrategizerSettings from "@/pages/agents/BlogContentStrategizerSettings";
 import { useEffect } from "react";
+import ConversionFunnelOptimizer from "./pages/agents/ConversionFunnelOptimizer";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +62,7 @@ const App = () => (
             
             {/* Agent Review Pages */}
             <Route path="/agents/keyword-optimizer" element={<ExternalRedirect to={AGENT_URLS.keywordOptimizer} />} />
-            <Route path="/agents/conversion-funnel-optimizer" element={<ExternalRedirect to={AGENT_URLS.conversionFunnel} />} />
+            <Route path="/agents/conversion-funnel-optimizer" element={<ConversionFunnelOptimizer/>} />
             <Route path="/agents/books-reconciler" element={<BooksReconcilerReview />} />
             <Route path="/agents/blog-content-strategizer" element={<BlogContentStrategizer />} />
             <Route path="/agents/blog-content-strategizer/settings" element={<BlogContentStrategizerSettings />} />

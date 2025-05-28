@@ -64,7 +64,7 @@ const CommandCenter = () => {
     if (categoryItems.length === 0) return null;
 
     return (
-      <div className="my-12 transition-all duration-300 ease-in-out">
+      <div className="mb-8 transition-all duration-300 ease-in-out">
         <h3 className="text-lg font-semibold mb-4">{category}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {categoryItems.map((item: AttentionItem) => (

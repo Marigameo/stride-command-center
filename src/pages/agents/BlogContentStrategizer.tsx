@@ -16,7 +16,13 @@ import {
   LayoutDashboard, 
   FileSearch,
   ArrowRight,
-  Pause
+  Pause,
+  CheckCircle,
+  Clock,
+  FileText,
+  ListChecks,
+  Loader2,
+  XCircle
 } from "lucide-react";
 import ReactFlow, { 
   Background, 
@@ -32,7 +38,6 @@ import ReactFlow, {
   Handle
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { VerticalMarquee } from "@/components/magicui/vertical-marquee";
 
 // Shimmer effect component
 const Shimmer = () => (
@@ -78,6 +83,98 @@ const CustomNode = ({ data }: { data: { label: string; isActive: boolean; comple
 // Node types definition
 const nodeTypes = {
   custom: CustomNode,
+};
+
+// AI Agent Loader Animation
+const AgentLoader = () => (
+  <div className="relative w-12 h-12 flex items-center justify-center"> {/* Increased size from 8 to 12 */}
+    <img 
+      src="/agentic.gif" 
+      alt="AI Processing"
+      className="w-full h-full object-contain"
+      style={{ 
+        filter: 'hue-rotate(200deg) brightness(1.2)',  // Makes the gif more bluish to match the theme
+        mixBlendMode: 'screen' 
+      }}
+    />
+  </div>
+);
+
+// Timeline Step Card
+const TimelineCard = ({ title, time, details, status }: {
+  title: string;
+  time: string;
+  details: string[];
+  status: 'completed' | 'current' | 'pending' | 'failed'; // Added 'failed' status
+}) => {
+  // Function to determine the icon based on the detail content
+  const getIcon = (detail: string) => {
+    if (detail.toLowerCase().includes('analyzed') || detail.toLowerCase().includes('extracted')) {
+      return <FileText className="w-4 h-4 mr-2 text-gray-500" />;
+    } else if (detail.toLowerCase().includes('identified') || detail.toLowerCase().includes('generated')) {
+      return <ListChecks className="w-4 h-4 mr-2 text-gray-500" />;
+    } else if (detail.toLowerCase().includes('analyzing') || detail.toLowerCase().includes('generating') || detail.toLowerCase().includes('evaluating')) {
+      return <Loader2 className="w-4 h-4 mr-2 text-gray-500 animate-spin" />;
+    } else {
+      return <Clock className="w-4 h-4 mr-2 text-gray-500" />;
+    }
+  };
+
+  // Function to determine the status badge
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <div className="ml-auto px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">Completed</div>;
+      case 'current':
+        return <div className="ml-auto px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">In Progress</div>;
+      case 'pending':
+        return <div className="ml-auto px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">Queued</div>;
+      case 'failed':
+        return <div className="ml-auto px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">Failed</div>;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className={`flex gap-6 transition-all duration-500 ${
+      status === 'pending' ? 'opacity-50 blur-[1px]' : 'opacity-100'
+    }`}>
+      <div className="flex flex-col items-center">
+        <div className="w-12 h-12 flex items-center justify-center">
+          {status === 'current' ? (
+            <AgentLoader />
+          ) : (
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+              status === 'completed' ? 'bg-green-100' : 'bg-gray-100'
+            }`}>
+              {status === 'completed' && (
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              )}
+            </div>
+          )}
+        </div>
+        <div className="w-0.5 h-full bg-gray-200" />
+      </div>
+      <div className="flex-1 pb-8">
+        <div className="flex items-center gap-2 mb-2">
+          <h3 className={`font-medium ${status === 'current' ? 'text-blue-600' : ''}`}>{title}</h3>
+          <span className="text-sm text-gray-500">{time}</span>
+          {getStatusBadge(status)} {/* Render status badge */}
+        </div>
+        <div className="space-y-3">
+          {details.map((detail, idx) => (
+            <Card key={idx} className={`p-3 border flex items-center ${
+              status === 'current' ? 'border-blue-100 shadow-blue-100/50' : ''
+            }`}>
+              {getIcon(detail)} {/* Render icon based on detail */}
+              <p className="text-sm text-gray-600">{detail}</p>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const BlogContentStrategizer = () => {
@@ -172,18 +269,49 @@ const BlogContentStrategizer = () => {
   
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdgesData);
 
-  // Workflow steps for animation
-  const workflowSteps = [
-    'Parse Competitor Blog Posts',
-    'Extract Properties & Keywords from Posts',
-    'Synthesize across Competing Posts',
-    'Recommend Blog Outline',
-    'Tune Sections to Brand Guidelines',
-    'Publish as Content Strategy'
+  // Timeline data
+  const timelineSteps = [
+    {
+      title: 'Parse Competitor Blog Posts',
+      time: '12 mins ago',
+      details: ['Analyzed 5 competitor articles', 'Extracted 1,200 words of relevant content'],
+      status: 'completed' as const
+    },
+    {
+      title: 'Extract Properties & Keywords',
+      time: '8 mins ago',
+      details: ['Identified 24 key topics', 'Generated keyword clusters with 85% relevance'],
+      status: 'completed' as const
+    },
+    {
+      title: 'Synthesize across Competing Posts',
+      time: '3 mins ago',
+      details: ['Created content overlap matrix', 'Identified 6 unique angles'],
+      status: 'completed' as const
+    },
+    {
+      title: 'Recommend Blog Outline',
+      time: 'In progress',
+      details: [
+        'Analyzing content gaps in competitor articles...',
+        'Generating optimal section structure...',
+        'Evaluating keyword placement strategies...'
+      ],
+      status: 'current' as const
+    },
+    {
+      title: 'Tune Sections to Brand Guidelines',
+      time: 'Pending',
+      details: ['Waiting to start'],
+      status: 'pending' as const
+    },
+    {
+      title: 'Publish as Content Strategy',
+      time: 'Pending',
+      details: ['Waiting to start'],
+      status: 'pending' as const
+    },
   ];
-
-  // Current active step (0-based index)
-  const activeStepIndex = 3; // "Recommend Blog Outline" is active
 
   return (
     <div className="space-y-8 my-6 relative">
@@ -278,98 +406,26 @@ const BlogContentStrategizer = () => {
         </Card>
       </section>
 
-      {/* Center Stage - Sequential Steps */}
+      {/* Center Stage - Timeline View */}
       <section className="px-4 py-8">
         <Card>
-          <CardContent className="p-0">
-            <div className="h-[600px] relative flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 pointer-events-none" />
-              <VerticalMarquee 
-                speed={50} 
-                className="h-full" 
-                activeIndex={activeStepIndex}
-              >
-                {workflowSteps.map((step, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center gap-4 p-6 rounded-lg border ${
-                      index > activeStepIndex 
-                        ? 'border-gray-100/20 bg-gray-50/50' 
-                        : 'border-gray-200/20 bg-card'
-                    } text-card-foreground shadow-sm mb-8`}
-                  >
-                    <div className="flex items-center space-x-4 w-full">
-                      <div className="flex-shrink-0">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                          index < activeStepIndex 
-                            ? 'bg-green-100' 
-                            : index === activeStepIndex 
-                              ? 'bg-blue-100'
-                              : 'bg-gray-100'
-                        }`}>
-                          {index < activeStepIndex ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          ) : (
-                            <div className={`w-2 h-2 rounded-full ${
-                              index === activeStepIndex 
-                                ? 'bg-blue-500' 
-                                : 'bg-gray-400'
-                            }`} />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex-grow">
-                        <h3 className={`text-lg ${
-                          index === activeStepIndex 
-                            ? 'font-semibold text-primary' 
-                            : index > activeStepIndex
-                              ? 'font-medium text-gray-500'
-                              : 'font-medium'
-                        }`}>
-                          {step}
-                          {index === activeStepIndex && (
-                            <span className="ml-2 text-sm text-muted-foreground">(In Progress)</span>
-                          )}
-                        </h3>
-                      </div>
-                      {index < activeStepIndex ? (
-                        <div className="flex-shrink-0">
-                          <span className="text-sm text-green-500 font-medium">Completed</span>
-                        </div>
-                      ) : index > activeStepIndex && (
-                        <div className="flex-shrink-0">
-                          <span className="text-sm text-gray-400 font-medium">Pending</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </VerticalMarquee>
+          <CardContent className="p-6">
+            <div className="max-h-[600px] overflow-y-auto timeline-container">
+              {timelineSteps.map((step, index) => (
+                <div
+                  key={index}
+                  className="animate-timeline-entry"
+                  style={{ animationDelay: `${index * 300}ms` }}
+                >
+                  <TimelineCard {...step} />
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </section>
 
       <style>{`
-        @keyframes sequential-reveal {
-          0% {
-            transform: translate(-50%, 30px) scale(0.95);
-            opacity: 0;
-            filter: blur(4px);
-          }
-          50% {
-            opacity: 0.5;
-            filter: blur(2px);
-          }
-          100% {
-            transform: translate(-50%, 0) scale(1);
-            opacity: 1;
-            filter: blur(0);
-          }
-        }
-
         @keyframes shimmer {
           0% {
             transform: translateX(-100%);
@@ -379,76 +435,79 @@ const BlogContentStrategizer = () => {
           }
         }
 
-        @keyframes pulse-glow {
-          0%, 100% {
-            opacity: 1;
-            filter: brightness(1) blur(0px);
+        @keyframes agent-pulse {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.5;
           }
           50% {
+            transform: scale(1.2);
             opacity: 0.8;
-            filter: brightness(1.2) blur(1px);
+          }
+          100% {
+            transform: scale(0.8);
+            opacity: 0.5;
           }
         }
 
-        @keyframes processing-dots {
-          0%, 100% {
-            opacity: 0.2;
+        @keyframes agent-ring {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.5;
           }
           50% {
-            opacity: 1;
+            transform: scale(1.1);
+            opacity: 0.3;
+          }
+          100% {
+            transform: scale(0.8);
+            opacity: 0.5;
           }
         }
 
-        .animate-sequential-reveal {
-          animation: sequential-reveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        @keyframes timeline-entry {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .animate-shimmer {
           animation: shimmer 2s infinite;
         }
 
-        .animate-pulse-glow {
-          animation: pulse-glow 2s ease-in-out infinite;
+        .animate-agent-pulse {
+          animation: agent-pulse 1.5s ease-in-out infinite;
         }
 
-        .text-glow {
-          text-shadow: 0 0 10px rgba(255,255,255,0.7),
-                     0 0 20px rgba(255,255,255,0.5),
-                     0 0 30px rgba(255,255,255,0.3);
+        .animate-agent-ring {
+          animation: agent-ring 1.5s ease-in-out infinite;
         }
 
-        .processing-step {
-          position: relative;
-          overflow: hidden;
+        .animate-timeline-entry {
+          animation: timeline-entry 0.5s ease-out forwards;
         }
 
-        .processing-step::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.1),
-            transparent
-          );
-          transform: translateX(-100%);
-          animation: shimmer 1.5s infinite;
+        .timeline-container {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
         }
 
-        .processing-dot {
-          animation: processing-dots 1s infinite;
+        .timeline-container::-webkit-scrollbar {
+          width: 6px;
         }
 
-        .processing-dot:nth-child(2) {
-          animation-delay: 0.2s;
+        .timeline-container::-webkit-scrollbar-track {
+          background: transparent;
         }
 
-        .processing-dot:nth-child(3) {
-          animation-delay: 0.4s;
+        .timeline-container::-webkit-scrollbar-thumb {
+          background-color: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
         }
       `}</style>
 
