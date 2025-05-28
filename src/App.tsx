@@ -17,6 +17,7 @@ import BlogContentStrategizer from "@/pages/agents/BlogContentStrategizer";
 import BlogContentStrategizerSettings from "@/pages/agents/BlogContentStrategizerSettings";
 import { useEffect } from "react";
 import ConversionFunnelOptimizer from "./pages/agents/ConversionFunnelOptimizer";
+import KeywordOptimizer from "./pages/agents/KeywordOptimizer";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +62,7 @@ const App = () => (
             <Route path="/marketplace" element={<div className="flex items-center justify-center min-h-[50vh]"><div className="text-center"><h1 className="text-2xl font-semibold mb-3">Marketplace</h1><p className="text-gray-600">Coming soon! Our marketplace will feature agent templates and extensions.</p></div></div>} />
             
             {/* Agent Review Pages */}
-            <Route path="/agents/keyword-optimizer" element={<ExternalRedirect to={AGENT_URLS.keywordOptimizer} />} />
+            <Route path="/agents/keyword-optimizer" element={<KeywordOptimizer/>} />
             <Route path="/agents/conversion-funnel-optimizer" element={<ConversionFunnelOptimizer/>} />
             <Route path="/agents/books-reconciler" element={<BooksReconcilerReview />} />
             <Route path="/agents/blog-content-strategizer" element={<BlogContentStrategizer />} />

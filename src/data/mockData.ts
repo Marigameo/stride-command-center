@@ -510,7 +510,7 @@ export const agentsGlance = [
     metric: "+$524 in savings",
     cta: "Review",
     ctaAction: "navigateToAgent",
-    agentPageUrl: "https://keyword-optimizer.vercel.app/",
+    agentPageUrl: "/agents/keyword-optimizer",
     category: "Marketing"
   },
   {
@@ -523,7 +523,7 @@ export const agentsGlance = [
     metric: "-34% Leads WoW",
     cta: "Review",
     ctaAction: "navigateToAgent",
-    agentPageUrl: "https://kzmkh0380c33wiacads9.lite.vusercontent.net/",
+    agentPageUrl: "/agents/conversion-funnel-optimizer",
     category: "Marketing"
   },
   {
