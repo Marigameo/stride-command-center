@@ -371,22 +371,64 @@ const BooksReconcilerReview = () => {
             </section>
 
             {/* Floating Dock Navigation */}
-            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 backdrop-blur-md rounded-full p-1.5 px-4 flex items-center gap-2 shadow-xl border border-orange-300/30">
-                    <div className="relative group">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-white hover:bg-white/10 rounded-full w-10 h-10"
-                            onClick={() => navigate('/agents/books-reconciler/settings')}
-                        >
-                            <Settings className="h-5 w-5" />
-                        </Button>
-                    </div>
-                    
-                    {/* Additional dock buttons can be added here */}
-                </div>
-            </div>
+                        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+                            <div className="bg-gradient-to-r from-orange-500 to-orange-600 backdrop-blur-md rounded-full p-1.5 px-4 flex items-center gap-2 shadow-xl border border-orange-300/30">
+                                <div className="relative group">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-white hover:bg-white/10 rounded-full w-10 h-10"
+                                        onClick={() => navigate('/agents/keyword-optimizer/settings')}
+                                    >
+                                        <Settings className="h-5 w-5" />
+                                        <span className="sr-only">Configure</span>
+                                    </Button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Configure
+                                    </div>
+                                </div>
+            
+                                <div className="relative group">
+                                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full w-10 h-10">
+                                        <Pause className="h-5 w-5" />
+                                        <span className="sr-only">Pause</span>
+                                    </Button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Pause
+                                    </div>
+                                </div>
+            
+                                <div className="relative group">
+                                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full w-10 h-10">
+                                        <BarChart3 className="h-5 w-5" />
+                                        <span className="sr-only">Default Metrics</span>
+                                    </Button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Default Metrics
+                                    </div>
+                                </div>
+            
+                                <div className="relative group">
+                                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full w-10 h-10">
+                                        <LayoutDashboard className="h-5 w-5" />
+                                        <span className="sr-only">Dashboard</span>
+                                    </Button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Dashboard
+                                    </div>
+                                </div>
+            
+                                <div className="relative group">
+                                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full w-10 h-10">
+                                        <FileSearch className="h-5 w-5" />
+                                        <span className="sr-only">Audit Trail</span>
+                                    </Button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Audit Trail
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
         </div>
     );
 };
