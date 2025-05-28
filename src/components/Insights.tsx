@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   LineChart,
   Line,
@@ -14,9 +16,10 @@ import {
   Bar,
   ReferenceLine,
 } from "recharts";
-import { TrendingUp, ChevronUp, ChevronDown, BarChart3 } from "lucide-react";
-import { performanceMetrics } from "@/data/mockData";
+import { TrendingUp, ChevronUp, ChevronDown, BarChart3, Brain, MessageSquare } from "lucide-react";
+import { agentsGlance as agents, performanceMetrics } from "@/data/mockData"; // Add performanceMetrics to import
 import MiniTrendChart from './MiniTrendChart';
+import ChatAssistant from "./ChatAssistant";
 import { cn } from '@/lib/utils';
 
 // Process performance trend data for interactive chart
@@ -107,6 +110,48 @@ const enhancedPerformanceMetrics = [
   }
 ];
 
+const workforceMetrics = [
+  {
+    id: 1,
+    metric: "Total Cost Saved",
+    value: "$7,489",
+    change: "+14%",
+    trend: "up",
+    timeline: "WoW"
+  },
+  {
+    id: 2,
+    metric: "Task Completion",
+    value: "89%",
+    change: "+5%",
+    trend: "up",
+    timeline: "WoW"
+  },
+  {
+    id: 3,
+    metric: "Acceptance Rate",
+    value: "95%",
+    change: "+2%",
+    trend: "up",
+    timeline: "WoW"
+  },
+  {
+    id: 4,
+    metric: "Conversion Rate",
+    value: "-9%",
+    change: "-34%",
+    trend: "down",
+    timeline: "WoW"
+  }
+];
+
+const weeklyTrendData = [
+  { week: 'Week 1', costSaved: 6200, taskCompletion: 82, acceptanceRate: 91, conversionRate: 12 },
+  { week: 'Week 2', costSaved: 6800, taskCompletion: 85, acceptanceRate: 92, conversionRate: 8 },
+  { week: 'Week 3', costSaved: 7100, taskCompletion: 87, acceptanceRate: 94, conversionRate: 4 },
+  { week: 'Week 4', costSaved: 7489, taskCompletion: 89, acceptanceRate: 95, conversionRate: -9 },
+];
+
 // Custom tooltip for the interactive chart
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -133,34 +178,81 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const Insights = () => {
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState(null);
+
+  // Group agents by category
+  const agentsByCategory = agents.reduce((acc, agent) => {
+    if (!acc[agent.category]) {
+      acc[agent.category] = [];
+    }
+    acc[agent.category].push(agent);
+    return acc;
+  }, {});
+
+  // Calculate category-specific insights
+  const categoryInsights = Object.keys(agentsByCategory).map(category => ({
+    category,
+    activeAgents: agentsByCategory[category].filter(a => a.status === 'Active').length,
+    totalAgents: agentsByCategory[category].length,
+    efficiency: Math.round(Math.random() * 20 + 80) // Mock efficiency score
+  }));
+
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-6">Workforce Insights</h1>
-      
-      {/* Performance Summary Section */}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Workforce Insights</h1>
+        <Button
+          onClick={() => setChatOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <MessageSquare className="w-4 h-4" />
+          Ask Strive AI
+        </Button>
+      </div>
+
+      {/* Category Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {categoryInsights.map((cat) => (
+          <Card key={cat.category}>
+            <CardContent className="p-6">
+              <h3 className="font-semibold mb-2">{cat.category}</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Active Agents</span>
+                  <span className="font-medium">{cat.activeAgents}/{cat.totalAgents}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Efficiency</span>
+                  <span className="font-medium text-green-600">{cat.efficiency}%</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Updated Performance Metrics Section */}
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Performance Summary (For the quarter)</h2>
+          <h2 className="text-xl font-semibold">Workforce Performance</h2>
         </div>
         
-        {/* Performance Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {enhancedPerformanceMetrics.map((metric) => (
-            <Card key={metric.id} className={metric.metric === "Conversion Rate" ? "border-red-300" : ""}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {workforceMetrics.map((metric) => (
+            <Card key={metric.id} className={metric.trend === "down" ? "border-red-300" : ""}>
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-medium text-gray-700 text-sm">{metric.metric}</h3>
                 </div>
                 <div className="flex items-end gap-2 mb-2">
-                  <span className={`text-2xl font-semibold ${metric.metric === "Conversion Rate" ? "text-red-600" : ""}`}>
+                  <span className={`text-2xl font-semibold ${metric.trend === "down" ? "text-red-600" : ""}`}>
                     {metric.value}
                   </span>
                   <span className={cn("text-xs font-medium pb-0.5", 
-                    metric.trend === "up" ? "text-green-600" : 
-                    metric.trend === "down" ? "text-red-600" : 
-                    "text-gray-600"
+                    metric.trend === "up" ? "text-green-600" : "text-red-600"
                   )}>
-                    {metric.change} (WoW)
+                    {metric.change} ({metric.timeline})
                   </span>
                 </div>
                 <MiniTrendChart 
@@ -171,6 +263,50 @@ const Insights = () => {
             </Card>
           ))}
         </div>
+
+        {/* Weekly Trend Chart */}
+        <Card className="p-6">
+          <h3 className="font-medium text-gray-700 mb-4">Weekly Performance Trends</h3>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={weeklyTrendData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="week" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="costSaved" 
+                  name="Cost Saved ($)" 
+                  stroke="#22c55e" 
+                  strokeWidth={2} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="taskCompletion" 
+                  name="Task Completion (%)" 
+                  stroke="#3b82f6" 
+                  strokeWidth={2} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="acceptanceRate" 
+                  name="Acceptance Rate (%)" 
+                  stroke="#a855f7" 
+                  strokeWidth={2} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="conversionRate" 
+                  name="Conversion Rate (%)" 
+                  stroke="#ef4444" 
+                  strokeWidth={2} 
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
       </section>
 
       {/* Agent Insights Section - Enhanced with better styling */}
@@ -211,6 +347,12 @@ const Insights = () => {
           })}
         </div>
       </section>
+
+      <ChatAssistant 
+        open={chatOpen} 
+        onOpenChange={setChatOpen}
+        selectedAgent={selectedAgent}
+      />
     </div>
   );
 };

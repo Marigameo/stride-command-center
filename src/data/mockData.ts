@@ -518,7 +518,7 @@ export const agentsGlance = [
     name: "Conversion Funnel Optimizer",
     agentLogo: "/avatars/avatar2.png",
     status: "Idle",
-    lastCompleted: "A/B Test Concluded",
+    lastCompleted: "Analyzing Google Competitors Funnel",
     progress: 100,
     metric: "-34% Leads WoW",
     cta: "Review",
@@ -865,6 +865,8 @@ export const agentsGlance = [
     category: "Sales"
   }
 ];
+
+export const agents = agentsGlance; // Export agents array using the existing agentsGlance data
 
 export const tasks = [
   {

@@ -39,10 +39,10 @@ type SuggestionPill = {
 };
 
 const suggestions: SuggestionPill[] = [
-  { id: "1", text: "Agent Status", query: "What are my agents currently working on?" },
-  { id: "2", text: "Critical Tasks", query: "Show me critical tasks that need attention" },
-  { id: "3", text: "Workforce Efficiency", query: "How efficient is my workforce today?" },
-  { id: "4", text: "Optimization Tips", query: "How can I optimize my workforce?" },
+  { id: "1", text: "Marketing Agents", query: "How are my marketing agents performing?" },
+  { id: "2", text: "Financial Operations", query: "Show me financial operations insights" },
+  { id: "3", text: "Sales Performance", query: "What's the performance of sales agents?" },
+  { id: "4", text: "Critical Insights", query: "Show me critical insights across all agents" },
 ];
 
 // Updated performance trend data to match the new insights
@@ -84,13 +84,112 @@ const insightsTableData = [
 ];
 
 // Updated mock responses
-const getMockResponse = (query: string): Message => {
+const getMockResponse = (query: string, selectedAgent: any): Message => {
   const lowerQuery = query.toLowerCase();
-  const id = Date.now() + 1;
-  
+  const id = Date.now().toString();
+
+  // Add guard rails for non-insight queries
+  if (lowerQuery.includes("price") || lowerQuery.includes("cost") || 
+      lowerQuery.includes("billing") || lowerQuery.includes("payment")) {
+    return {
+      id,
+      content: "I can only help with agent insights and performance metrics. For billing or pricing queries, please contact support.",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "text"
+    };
+  }
+
+  // Marketing agents performance
+  if (lowerQuery.includes("marketing agents") || lowerQuery.includes("marketing performance")) {
+    return {
+      id,
+      content: "Here's how your marketing agents are performing:",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "chart",
+      data: {
+        type: "bar",
+        data: [
+          { name: "Keyword Optimizer", performance: 92, tasks: 15 },
+          { name: "Content Strategist", performance: 88, tasks: 12 },
+          { name: "SEO Specialist", performance: 85, tasks: 20 },
+        ],
+        xKey: "name",
+        yKey: "performance"
+      }
+    };
+  }
+
+  // Financial operations insights
+  if (lowerQuery.includes("financial") || lowerQuery.includes("finance")) {
+    return {
+      id,
+      content: "Current financial operations insights:",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "table",
+      data: [
+        { insight: "Books Reconciler", value: "27 pending", change: "On track", status: "Active" },
+        { insight: "Spend Auditor", value: "2 alerts", change: "Needs review", status: "Warning" },
+        { insight: "Invoice Processor", value: "15 processed", change: "+12%", status: "Optimal" }
+      ]
+    };
+  }
+
+  // Sales performance
+  if (lowerQuery.includes("sales")) {
+    return {
+      id,
+      content: "Sales agents performance overview:",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "chart",
+      data: {
+        type: "line",
+        data: performanceTrendData,
+        xKey: "name",
+        yKey: ["completionRate", "efficiency"]
+      }
+    };
+  }
+
+  // Critical insights
+  if (lowerQuery.includes("critical")) {
+    return {
+      id,
+      content: "Here are the critical insights across all agents:",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "table",
+      data: [
+        { insight: "Lead Scoring", value: "10 high-value", change: "Urgent", status: "Critical" },
+        { insight: "Fraud Detection", value: "1 alert", change: "Immediate action", status: "Critical" },
+        { insight: "Campaign Performance", value: "-15% CTR", change: "Declining", status: "Warning" }
+      ]
+    };
+  }
+
+  // Default response for performance and other queries
+  if (lowerQuery.includes("performing") || lowerQuery.includes("performance")) {
+    return {
+      id,
+      content: "Here's the current performance overview of your agents:",
+      role: "assistant",
+      timestamp: new Date(),
+      componentType: "table",
+      data: agentProductivityData.map(agent => ({
+        insight: agent.name,
+        value: `${agent.efficiency}% efficient`,
+        change: `${agent.tasks} tasks`,
+        status: agent.status
+      }))
+    };
+  }
+
   if (lowerQuery.includes("working on") || lowerQuery.includes("status")) {
     return {
-      id: id.toString(),
+      id,
       content: "Here's the current status of your AI workforce:",
       role: "assistant",
       timestamp: new Date(),
@@ -104,7 +203,7 @@ const getMockResponse = (query: string): Message => {
     };
   } else if (lowerQuery.includes("critical") || lowerQuery.includes("attention")) {
     return {
-      id: id.toString(),
+      id,
       content: "Here are the tasks requiring immediate attention:",
       role: "assistant",
       timestamp: new Date(),
@@ -118,7 +217,7 @@ const getMockResponse = (query: string): Message => {
     };
   } else if (lowerQuery.includes("efficient") || lowerQuery.includes("performance")) {
     return {
-      id: id.toString(),
+      id,
       content: "Your workforce efficiency over the last 7 days:",
       role: "assistant",
       timestamp: new Date(),
@@ -132,7 +231,7 @@ const getMockResponse = (query: string): Message => {
     };
   } else if (lowerQuery.includes("optimize") || lowerQuery.includes("improvement")) {
     return {
-      id: id.toString(),
+      id,
       content: "Based on current metrics, here are the key areas for optimization:",
       role: "assistant",
       timestamp: new Date(),
@@ -146,7 +245,7 @@ const getMockResponse = (query: string): Message => {
     };
   } else {
     return {
-      id: id.toString(),
+      id,
       content: "I can help you monitor and optimize your AI workforce. Try asking about agent status, critical tasks, workforce efficiency, or optimization opportunities.",
       role: "assistant",
       timestamp: new Date(),
@@ -163,7 +262,13 @@ const loadingStates = [
   "Generating response..."
 ];
 
-const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => {
+interface ChatAssistantProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  selectedAgent?: any; // Make selectedAgent optional
+}
+
+const ChatAssistant = ({ open, onOpenChange, selectedAgent }: ChatAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -205,7 +310,7 @@ const ChatAssistant = ({ open, onOpenChange }: { open: boolean; onOpenChange: (o
     
     // Simulate processing delay
     setTimeout(() => {
-      const assistantMessage = getMockResponse(messageContent);
+      const assistantMessage = getMockResponse(messageContent, selectedAgent);
       setMessages(prev => [...prev, assistantMessage]);
       setIsLoading(false);
     }, 3000);

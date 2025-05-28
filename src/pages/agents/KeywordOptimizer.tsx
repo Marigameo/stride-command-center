@@ -395,7 +395,7 @@ const KeywordOptimizer = () => {
                     <CardContent className="pt-6">
                         <div className="flex flex-col gap-2 mb-4">
                             <div>
-                                <span className="font-medium">Analyzing Google Ads Account</span>
+                                <span className="font-medium">Optimizing Holiday Campaign</span>
                             </div>
                             <div>
                                 <span className="font-medium text-gray-600">Potential Savings: $524</span>
@@ -406,7 +406,7 @@ const KeywordOptimizer = () => {
                                 <span>Progress</span>
                                 <span>65%</span>
                             </div>
-                            <Progress value={70} className="h-2 [&>div]:bg-orange-500" />
+                            <Progress value={65} className="h-2 [&>div]:bg-orange-500" />
                         </div>
                     </CardContent>
                 </Card>
