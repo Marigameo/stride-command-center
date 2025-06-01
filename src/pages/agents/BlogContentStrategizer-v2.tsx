@@ -955,8 +955,8 @@ const BlogContentStrategizerV2 = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-medium">Started</div>
-                  <div className="text-sm text-gray-600">2 hours ago</div>
+                  <div className="text-sm font-medium">{isPaused ? 'Paused' : 'Started'}</div>
+                  <div className="text-sm text-gray-600">{isOutlineApproved || isPaused ? 'Just Now' : '2 hours ago'}</div>
                 </div>
               </div>
             </div>
