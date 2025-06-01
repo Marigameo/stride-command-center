@@ -18,6 +18,7 @@ import BlogContentStrategizerSettings from "@/pages/agents/BlogContentStrategize
 import { useEffect } from "react";
 import ConversionFunnelOptimizer from "./pages/agents/ConversionFunnelOptimizer";
 import KeywordOptimizer from "./pages/agents/KeywordOptimizer";
+import BlogContentStrategizerV2 from "./pages/agents/BlogContentStrategizer-v2";
 
 const queryClient = new QueryClient();
 
@@ -65,7 +66,7 @@ const App = () => (
             <Route path="/agents/keyword-optimizer" element={<KeywordOptimizer/>} />
             <Route path="/agents/conversion-funnel-optimizer" element={<ConversionFunnelOptimizer/>} />
             <Route path="/agents/books-reconciler" element={<BooksReconcilerReview />} />
-            <Route path="/agents/blog-content-strategizer" element={<BlogContentStrategizer />} />
+            <Route path="/agents/blog-content-strategizer" element={<BlogContentStrategizerV2 />} />
             <Route path="/agents/blog-content-strategizer/settings" element={<BlogContentStrategizerSettings />} />
 
             {/* Reauth page inside layout */}
