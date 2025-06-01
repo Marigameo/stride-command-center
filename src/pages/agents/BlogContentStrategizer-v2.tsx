@@ -423,6 +423,61 @@ const BlogContentStrategizerV2 = () => {
       }
 
       setWorkflowSteps(updatedWorkflowSteps);
+
+      // Update nodes to reflect the new state
+      const updatedNodes = nodes.map((node, index) => {
+        if (index === currentStepIndex) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              isActive: false,
+              completed: true,
+              isPaused: false,
+              logs: ['Outline approved by user'],
+              timestamp: 'Just now'
+            }
+          };
+        } else if (index === currentStepIndex + 1) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              isActive: true,
+              completed: false,
+              isPaused: false,
+              logs: [
+                'Tuning sections to match brand guidelines',
+                'Optimizing content for SEO',
+                'Generating meta descriptions'
+              ],
+              timestamp: 'Just now'
+            }
+          };
+        }
+        return node;
+      });
+
+      // Update edges to reflect the new state
+      const updatedEdges = edges.map((edge, index) => {
+        if (index === currentStepIndex) {
+          return {
+            ...edge,
+            animated: false,
+            style: { stroke: '#22c55e', strokeWidth: 2 }
+          };
+        } else if (index === currentStepIndex + 1) {
+          return {
+            ...edge,
+            animated: true,
+            style: { stroke: '#60a5fa', strokeWidth: 2 }
+          };
+        }
+        return edge;
+      });
+
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
     }
   };
 
@@ -665,36 +720,40 @@ const BlogContentStrategizerV2 = () => {
 
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdgesData);
 
-  // Connected tools data with state management
-  const [connectedTools, setConnectedTools] = useState([
-    { name: 'Research', logoUrl: '/tool-logos/globe.svg' },
-    { name: 'Grammarly', logoUrl: '/tool-logos/grammarly.svg' },
-    { name: 'Images', logoUrl: '/tool-logos/database-zap.svg' },
-    { name: 'Surfer', logoUrl: '/tool-logos/surfer.png' },
+  // Available connections from AccountSettings with connected status
+  const [connections, setConnections] = useState([
+    { id: "research", name: "Research", logo: "/tool-logos/globe.svg", connected: true },
+    { id: "grammarly", name: "Grammarly", logo: "/tool-logos/grammarly.svg", connected: true },
+    { id: "images", name: "Images", logo: "/tool-logos/database-zap.svg", connected: true },
+    { id: "surfer", name: "Surfer", logo: "/tool-logos/surfer.png", connected: true },
+    { id: "googleAds", name: "Google Ads", logo: "https://www.gstatic.com/images/branding/product/2x/ads_48dp.png", connected: false },
+    { id: "googleDrive", name: "Google Drive", logo: "https://ssl.gstatic.com/images/branding/product/2x/drive_48dp.png", connected: false },
+    { id: "zohoBooks", name: "Zoho Books", logo: "https://zoho.codafish.net/wp-content/uploads/2022/08/books-512-1.png", connected: false },
+    { id: "hubspot", name: "Hubspot", logo: "https://www.hubspot.com/hubfs/HubSpot_Logos/HubSpot-Inversed-Favicon.png", connected: false },
+    { id: "slack", name: "Slack", logo: "https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png", connected: false },
   ]);
 
-  // Available connections from AccountSettings
-  const availableConnections = [
-    { id: "googleAds", name: "Google Ads", logo: "https://www.gstatic.com/images/branding/product/2x/ads_48dp.png" },
-    { id: "googleDrive", name: "Google Drive", logo: "https://ssl.gstatic.com/images/branding/product/2x/drive_48dp.png" },
-    { id: "zohoBooks", name: "Zoho Books", logo: "https://zoho.codafish.net/wp-content/uploads/2022/08/books-512-1.png" },
-    { id: "hubspot", name: "Hubspot", logo: "https://www.hubspot.com/hubfs/HubSpot_Logos/HubSpot-Inversed-Favicon.png" },
-    { id: "slack", name: "Slack", logo: "https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png" },
-  ];
-
-  const handleRemoveTool = (toolName: string) => {
-    setConnectedTools(connectedTools.filter(tool => tool.name !== toolName));
+  const handleRemoveTool = (toolId: string) => {
+    setConnections(connections.map(conn => 
+      conn.id === toolId ? { ...conn, connected: false } : conn
+    ));
+    setSelectedTool("");
   };
 
   const handleAddTool = () => {
     if (selectedTool) {
-      const connection = availableConnections.find(conn => conn.id === selectedTool);
-      if (connection && !connectedTools.some(tool => tool.name === connection.name)) {
-        setConnectedTools([...connectedTools, { name: connection.name, logoUrl: connection.logo }]);
-        setSelectedTool("");
-      }
+      setConnections(connections.map(conn => 
+        conn.id === selectedTool ? { ...conn, connected: true } : conn
+      ));
+      setSelectedTool("");
     }
   };
+
+  // Get connected tools for display
+  const connectedTools = connections.filter(conn => conn.connected);
+
+  // Get available tools for dropdown
+  const availableTools = connections.filter(conn => !conn.connected);
 
   const [isToolSettingsOpen, setIsToolSettingsOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string>("");
@@ -747,7 +806,25 @@ const BlogContentStrategizerV2 = () => {
       return node;
     });
     
+    // Update edges to reflect paused state
+    const updatedEdges = edges.map(edge => {
+      if (edge.animated) {
+        return {
+          ...edge,
+          animated: isPaused ? false : true,
+          style: {
+            ...edge.style,
+            stroke: isPaused ? '#64748b' : '#60a5fa',
+            strokeWidth: isPaused ? 1.5 : 2,
+            strokeDasharray: isPaused ? '4,4' : undefined
+          }
+        };
+      }
+      return edge;
+    });
+    
     setNodes(updatedNodes);
+    setEdges(updatedEdges);
   };
 
   return (
@@ -806,10 +883,10 @@ const BlogContentStrategizerV2 = () => {
                         <div className="flex flex-wrap gap-2">
                           {connectedTools.map((tool) => (
                             <ToolBadge
-                              key={tool.name}
+                              key={tool.id}
                               name={tool.name}
-                              logoUrl={tool.logoUrl}
-                              onRemove={() => handleRemoveTool(tool.name)}
+                              logoUrl={tool.logo}
+                              onRemove={() => handleRemoveTool(tool.id)}
                             />
                           ))}
                         </div>
@@ -824,16 +901,14 @@ const BlogContentStrategizerV2 = () => {
                               <SelectValue placeholder="Select a tool" />
                             </SelectTrigger>
                             <SelectContent>
-                              {availableConnections
-                                .filter(conn => !connectedTools.some(tool => tool.name === conn.name))
-                                .map((connection) => (
-                                  <SelectItem key={connection.id} value={connection.id}>
-                                    <div className="flex items-center gap-2">
-                                      <img src={connection.logo} alt={connection.name} className="w-4 h-4" />
-                                      <span>{connection.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
+                              {availableTools.map((connection) => (
+                                <SelectItem key={connection.id} value={connection.id}>
+                                  <div className="flex items-center gap-2">
+                                    <img src={connection.logo} alt={connection.name} className="w-4 h-4" />
+                                    <span>{connection.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <Button
@@ -852,7 +927,7 @@ const BlogContentStrategizerV2 = () => {
               </div>
               <div className="flex flex-wrap gap-2">
                 {connectedTools.map((tool, index) => (
-                  <ToolBadge key={index} name={tool.name} logoUrl={tool.logoUrl} />
+                  <ToolBadge key={index} name={tool.name} logoUrl={tool.logo} />
                 ))}
               </div>
             </div>
@@ -955,6 +1030,7 @@ const BlogContentStrategizerV2 = () => {
                       variant="ghost" 
                       size="sm" 
                       className="text-gray-600 hover:text-gray-700 hover:bg-gray-100"
+                      onClick={() => navigate('/agents/blog-content-strategizer/settings')}
                     >
                       <Settings className="h-4 w-4" />
                     </Button>
