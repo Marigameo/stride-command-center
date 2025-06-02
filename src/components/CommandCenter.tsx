@@ -40,6 +40,18 @@ const CommandCenter = () => {
             window.open(url, '_blank');
           } else {
             navigate(url);
+            
+            // If URL contains a fragment identifier, scroll to that element after navigation
+            const fragment = url.split('#')[1];
+            if (fragment) {
+              // Use setTimeout to ensure navigation completes before scrolling
+              setTimeout(() => {
+                const element = document.getElementById(fragment);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              }, 100);
+            }
           }
         }
         break;

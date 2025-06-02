@@ -388,6 +388,8 @@ const BlogContentStrategizerV2 = () => {
 
   const handleApproveOutline = () => {
     setIsOutlineApproved(true);
+    // Reset isPaused to false to start processing the next step
+    setIsPaused(false);
 
     // Show success toast
     toast({
@@ -401,32 +403,24 @@ const BlogContentStrategizerV2 = () => {
     const currentStepIndex = updatedWorkflowSteps.findIndex(step => step.status === 'current');
 
     if (currentStepIndex !== -1) {
-      // Mark current step as completed
+      // Update current step to show it's processing
       updatedWorkflowSteps[currentStepIndex] = {
         ...updatedWorkflowSteps[currentStepIndex],
-        status: 'completed',
-        logs: ['Outline approved by user'],
-        timestamp: 'Just now'
+        status: 'current' as const,
+        logs: [
+          'Optimizing content to match brand guidelines',
+          'Enhancing SEO elements',
+          'Generating meta descriptions'
+        ],
+        timestamp: 'Processing...'
       };
-
-      // Activate next step if exists
-      if (currentStepIndex < updatedWorkflowSteps.length - 1) {
-        updatedWorkflowSteps[currentStepIndex + 1] = {
-          ...updatedWorkflowSteps[currentStepIndex + 1],
-          status: 'current',
-          logs: [
-            'Tuning sections to match brand guidelines',
-            'Optimizing content for SEO',
-            'Generating meta descriptions'
-          ]
-        };
-      }
 
       setWorkflowSteps(updatedWorkflowSteps);
 
       // Update nodes to reflect the new state
-      const updatedNodes = nodes.map((node, index) => {
-        if (index === currentStepIndex) {
+      const updatedNodes = nodes.map((node) => {
+        // Find the "Recommend Blog Outline" node (id: '4')
+        if (node.id === '4') {
           return {
             ...node,
             data: {
@@ -438,7 +432,9 @@ const BlogContentStrategizerV2 = () => {
               timestamp: 'Just now'
             }
           };
-        } else if (index === currentStepIndex + 1) {
+        } 
+        // Find the "Tune Sections to Brand Guidelines" node (id: '5')
+        else if (node.id === '5') {
           return {
             ...node,
             data: {
@@ -447,11 +443,25 @@ const BlogContentStrategizerV2 = () => {
               completed: false,
               isPaused: false,
               logs: [
-                'Tuning sections to match brand guidelines',
+                'Starting to tune sections to brand guidelines',
                 'Optimizing content for SEO',
                 'Generating meta descriptions'
               ],
               timestamp: 'Just now'
+            }
+          };
+        }
+        // Make sure "Publish as Content Strategy" node (id: '6') is not active
+        else if (node.id === '6') {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              isActive: false,
+              completed: false,
+              isPaused: false,
+              logs: ['Waiting to start'],
+              timestamp: '-'
             }
           };
         }
@@ -460,13 +470,16 @@ const BlogContentStrategizerV2 = () => {
 
       // Update edges to reflect the new state
       const updatedEdges = edges.map((edge, index) => {
-        if (index === currentStepIndex) {
+        // Edge from "Recommend Blog Outline" to "Tune Sections to Brand Guidelines"
+        if (index === 3) {
           return {
             ...edge,
             animated: false,
             style: { stroke: '#22c55e', strokeWidth: 2 }
           };
-        } else if (index === currentStepIndex + 1) {
+        } 
+        // Edge from "Tune Sections to Brand Guidelines" to "Publish as Content Strategy"
+        else if (index === 4) {
           return {
             ...edge,
             animated: true,
@@ -525,21 +538,21 @@ const BlogContentStrategizerV2 = () => {
     },
     {
       title: 'Recommend Blog Outline',
-      status: 'current' as const,
+      status: 'completed' as const,
       description: 'Generate optimal section structure and keyword placement',
       logs: [
-        'Analyzing content gaps in competitor articles...',
-        'Generating optimal section structure...',
-        'Evaluating keyword placement strategies...'
+        'Generated optimal section structure',
+        'Placed keywords strategically',
+        'Outline ready for review'
       ],
-      timestamp: '32s'
+      timestamp: '2m'
     },
     {
       title: 'Tune Sections to Brand Guidelines',
-      status: 'pending' as const,
+      status: 'current' as const,
       description: 'Adjust content to match brand voice and style',
-      logs: ['Waiting to start'],
-      timestamp: '-'
+      logs: ['Waiting for outline review before proceeding'],
+      timestamp: 'Paused'
     },
     {
       title: 'Publish as Content Strategy',
@@ -599,16 +612,16 @@ const BlogContentStrategizerV2 = () => {
       type: 'custom',
       data: {
         label: 'Recommend Blog Outline',
-        isActive: true,
-        completed: false,
+        isActive: false,
+        completed: true,
         isPaused: false,
         description: 'Generate optimal section structure and keyword placement',
         logs: [
-          'Analyzing content gaps in competitor articles...',
-          'Generating optimal section structure...',
-          'Evaluating keyword placement strategies...'
+          'Generated optimal section structure',
+          'Placed keywords strategically',
+          'Outline ready for review'
         ],
-        timestamp: '32s'
+        timestamp: '2m'
       },
       position: { x: 250, y: 650 },
     },
@@ -617,11 +630,11 @@ const BlogContentStrategizerV2 = () => {
       type: 'custom',
       data: {
         label: 'Tune Sections to Brand Guidelines',
-        isActive: false,
+        isActive: true,
         completed: false,
-        isPaused: false,
+        isPaused: true,
         description: 'Adjust content to match brand voice and style',
-        logs: ['Waiting to start'],
+        logs: ['Waiting for outline review before proceeding'],
         timestamp: '-'
       },
       position: { x: 250, y: 850 },
@@ -758,7 +771,7 @@ const BlogContentStrategizerV2 = () => {
   const [isToolSettingsOpen, setIsToolSettingsOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string>("");
 
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
 
   // Handle pause/resume
   const handlePauseResume = () => {
@@ -941,22 +954,20 @@ const BlogContentStrategizerV2 = () => {
                     <h2 className="text-lg font-medium">
                       {isOutlineApproved 
                         ? 'Tuning Sections to Brand Guidelines' 
-                        : isPaused 
-                          ? 'Execution Paused'
-                          : 'Recommending Blog Outline'}
+                        : 'Waiting for Outline Review'}
                     </h2>
                     <p className="text-sm text-gray-600">
                       {isOutlineApproved 
-                        ? 'Optimizing content structure and enhancing SEO elements...'
-                        : isPaused
-                          ? 'Click resume to continue processing...'
-                          : 'Analyzing content gaps in competitor articles...'}
+                        ? isPaused 
+                          ? 'Processing paused - click resume to continue' 
+                          : 'Optimizing content structure and enhancing SEO elements...'
+                        : 'Outline is ready and waiting for your approval'}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-medium">{isPaused ? 'Paused' : 'Started'}</div>
-                  <div className="text-sm text-gray-600">{isOutlineApproved || isPaused ? 'Just Now' : '2 hours ago'}</div>
+                  <div className="text-sm font-medium">{isPaused ? (isOutlineApproved ? 'Paused' : 'Paused - Waiting for Approval') : 'Running'}</div>
+                  <div className="text-sm text-gray-600">{isOutlineApproved ? 'Just Now' : isPaused ? 'Outline needs review' : '2 hours ago'}</div>
                 </div>
               </div>
             </div>
@@ -1004,28 +1015,42 @@ const BlogContentStrategizerV2 = () => {
 
                   {/* Controls */}
                   <div className="flex justify-between mb-6">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className={`flex items-center gap-2 ${
-                        isPaused 
-                          ? 'text-green-600 border-green-200 hover:bg-green-50' 
-                          : 'text-orange-600 border-orange-200 hover:bg-orange-50'
-                      }`}
-                      onClick={handlePauseResume}
-                    >
-                      {isPaused ? (
-                        <>
-                          <Play className="h-4 w-4" />
-                          <span>Resume</span>
-                        </>
-                      ) : (
-                        <>
-                          <Pause className="h-4 w-4" />
-                          <span>Pause</span>
-                        </>
-                      )}
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className={`flex items-center gap-2 ${
+                                isPaused 
+                                  ? 'text-green-600 border-green-200 hover:bg-green-50' 
+                                  : 'text-orange-600 border-orange-200 hover:bg-orange-50'
+                              }`}
+                              onClick={handlePauseResume}
+                              disabled={isPaused && !isOutlineApproved}
+                            >
+                              {isPaused ? (
+                                <>
+                                  <Play className="h-4 w-4" />
+                                  <span>Resume</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Pause className="h-4 w-4" />
+                                  <span>Pause</span>
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </TooltipTrigger>
+                        {isPaused && !isOutlineApproved && (
+                          <TooltipContent side="top">
+                            <p className="text-xs">Approve outline to resume processing</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -1079,9 +1104,9 @@ const BlogContentStrategizerV2 = () => {
       <section className="px-4 py-8" id="main-stage">
         <Card>
           <CardContent className="p-8">
-            <div className="mb-6">
+            <div id="content-outline" className="mb-6">
               <h2 className="text-xl font-semibold mb-4">
-                {isOutlineApproved ? 'Tuning Content to Brand Guidelines' : 'Content Outline Generated'}
+                {isOutlineApproved ? 'Tuning Sections to Brand Guidelines' : 'Content Outline Generated'}
               </h2>
               <div className="bg-orange-50 border border-orange-100 rounded-lg p-4 mb-6">
                 <h3 className="text-lg font-medium text-orange-800 mb-2">Overview</h3>
