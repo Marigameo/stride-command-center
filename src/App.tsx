@@ -12,6 +12,7 @@ import Insights from "@/components/Insights";
 import MyWorkforce from "@/components/MyWorkforce";
 import AccountSettings from "@/components/AccountSettings";
 import Layout from "@/components/Layout";
+import FederatedComponentDemo from "@/components/FederatedComponentDemo";
 import BooksReconcilerReview from "@/pages/agents/BooksReconcilerReview";
 import BlogContentStrategizer from "@/pages/agents/BlogContentStrategizer";
 import BlogContentStrategizerSettings from "@/pages/agents/BlogContentStrategizerSettings";
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/insights" element={<Insights />} />
             <Route path="/my-workforce" element={<MyWorkforce />} />
             <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/module-federation-demo" element={<div className="p-6"><FederatedComponentDemo /></div>} />
             <Route path="/marketplace" element={<div className="flex items-center justify-center min-h-[50vh]"><div className="text-center"><h1 className="text-2xl font-semibold mb-3">Marketplace</h1><p className="text-gray-600">Coming soon! Our marketplace will feature agent templates and extensions.</p></div></div>} />
             
             {/* Agent Review Pages */}

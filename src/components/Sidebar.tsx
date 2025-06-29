@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAppStore, type Page } from "@/store/appStore";
 import { cn } from "@/lib/utils";
-import { MonitorCog, Lightbulb, Store, UsersRound, Settings, ChevronLeft, ChevronRight, ClipboardList } from "lucide-react";
+import { MonitorCog, Lightbulb, Store, UsersRound, Settings, ChevronLeft, ChevronRight, ClipboardList, Puzzle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const Sidebar = () => {
@@ -12,6 +12,7 @@ const Sidebar = () => {
     { id: "myWorkforce", title: "My Workforce", icon: <UsersRound size={20} />, route: "/my-workforce" },
     { id: "myTasks", title: "My Tasks", icon: <ClipboardList size={20} />, route: "/my-tasks" },
     { id: "insights", title: "Insights", icon: <Lightbulb size={20} />, route: "/insights" },
+    { id: "moduleFederationDemo", title: "Module Federation", icon: <Puzzle size={20} />, badge: "Demo", route: "/module-federation-demo" },
     {
       id: "marketplace",
       title: "Marketplace",
